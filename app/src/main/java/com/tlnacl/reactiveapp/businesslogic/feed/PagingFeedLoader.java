@@ -23,6 +23,8 @@ import com.tlnacl.reactiveapp.businesslogic.model.Product;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 
 /**
@@ -36,6 +38,7 @@ public class PagingFeedLoader {
   private boolean endReached = false;
   private boolean newestPageLoaded = false;
 
+  @Inject
   public PagingFeedLoader(ProductBackendApiDecorator backend) {
     this.backend = backend;
   }

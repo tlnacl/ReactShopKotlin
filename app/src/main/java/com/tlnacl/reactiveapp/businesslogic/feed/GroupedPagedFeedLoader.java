@@ -26,6 +26,8 @@ import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 
 /**
@@ -38,7 +40,7 @@ import io.reactivex.Observable;
 public class GroupedPagedFeedLoader {
   private final PagingFeedLoader feedLoader;
   private final int collapsedGroupProductItemCount = 3;
-
+    @Inject
   public GroupedPagedFeedLoader(PagingFeedLoader feedLoader) {
     this.feedLoader = feedLoader;
   }

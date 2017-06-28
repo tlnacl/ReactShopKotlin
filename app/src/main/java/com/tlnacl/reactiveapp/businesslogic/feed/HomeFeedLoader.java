@@ -24,6 +24,8 @@ import com.tlnacl.reactiveapp.businesslogic.model.Product;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 
 /**
@@ -35,6 +37,7 @@ public class HomeFeedLoader {
   private final GroupedPagedFeedLoader groupedLoader;
   private final ProductBackendApiDecorator backendApi;
 
+  @Inject
   public HomeFeedLoader(GroupedPagedFeedLoader groupedLoader,
       ProductBackendApiDecorator backendApi) {
     this.groupedLoader = groupedLoader;
@@ -45,21 +48,21 @@ public class HomeFeedLoader {
    * Typically triggered with a pull-to-refresh
    */
   public Observable<List<FeedItem>> loadNewestPage() {
-    return groupedLoader.getNewestPage().delay(2, TimeUnit.SECONDS);
+    return groupedLoader.getNewestPage().delay(1, TimeUnit.SECONDS);
   }
 
   /**
    * Loads the first page
    */
   public Observable<List<FeedItem>> loadFirstPage() {
-    return groupedLoader.getGroupedFirstPage().delay(2, TimeUnit.SECONDS);
+    return groupedLoader.getGroupedFirstPage().delay(1, TimeUnit.SECONDS);
   }
 
   /**
    * loads the next page (pagination)
    */
   public Observable<List<FeedItem>> loadNextPage() {
-    return groupedLoader.getGroupedNextPage().delay(2, TimeUnit.SECONDS);
+    return groupedLoader.getGroupedNextPage().delay(1, TimeUnit.SECONDS);
   }
 
   /**
@@ -68,6 +71,6 @@ public class HomeFeedLoader {
    * @param categoryName the category name
    */
   public Observable<List<Product>> loadProductsOfCategory(String categoryName) {
-    return backendApi.getAllProductsOfCategory(categoryName).delay(3, TimeUnit.SECONDS);
+    return backendApi.getAllProductsOfCategory(categoryName).delay(1, TimeUnit.SECONDS);
   }
 }

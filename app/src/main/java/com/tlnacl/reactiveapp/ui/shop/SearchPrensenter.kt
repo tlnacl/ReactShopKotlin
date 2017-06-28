@@ -29,7 +29,7 @@ class SearchPrensenter
     //TODO handle ui event is in all presenter move to BasePresenter
     fun handleUiEvent(query: Observable<String>) {
         //interesting result of SearchNotStartedYet if using flatMap instead of switchMap
-        query.switchMap { searchString ->
+        startDisposables.add(query.switchMap { searchString ->
             if (searchString.isEmpty()) Observable.just(SearchViewState.SearchNotStartedYet)
             else searchEngine.searchFor(searchString)
                     .map<SearchViewState> { products ->
@@ -43,6 +43,6 @@ class SearchPrensenter
 
         }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { mvpView?.render(it) }
+                .subscribe { mvpView?.render(it) })
     }
 }

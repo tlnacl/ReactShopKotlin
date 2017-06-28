@@ -31,8 +31,7 @@ import retrofit2.http.Path;
  * @author Hannes Dorfmann
  */
 public interface ProductBackendApi {
-
-  @GET("/tlnacl/reactiveApp/shop"
+  @GET("/tlnacl/ReactShopKotlin/master"
       + "/app/server/api/products{pagination}.json")
   Observable<List<Product>> getProducts(@Path("pagination") int pagination);
 }

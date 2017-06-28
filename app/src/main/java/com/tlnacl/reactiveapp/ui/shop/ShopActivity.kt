@@ -8,6 +8,7 @@ import butterknife.ButterKnife
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
+import com.tlnacl.reactiveapp.ui.home.HomeFragment
 
 class ShopActivity : AppCompatActivity() {
     @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
@@ -22,12 +23,17 @@ class ShopActivity : AppCompatActivity() {
         toolbar.title = "Reactive App"
         toolbar.inflateMenu(R.menu.activity_main_toolbar)
 
-        supportFragmentManager.beginTransaction()
-            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                android.R.anim.fade_in, android.R.anim.fade_out)
-            .add(R.id.shop_layout, SearchFragment())
-            .addToBackStack("Search")
-            .commit()
+        toolbar.setOnMenuItemClickListener {
+            supportFragmentManager.beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                            android.R.anim.fade_in, android.R.anim.fade_out)
+                    .add(R.id.shop_layout, SearchFragment())
+                    .addToBackStack("Search")
+                    .commit()
+            true
+        }
+
+        supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, HomeFragment()).commit()
     }
 
     private fun closeSlidingUpPanelIfOpen(): Boolean {
