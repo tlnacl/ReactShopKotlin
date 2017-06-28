@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp.ui.shop
+package com.tlnacl.reactiveapp.ui.search
 
 import android.os.Bundle
 import android.support.transition.TransitionManager
@@ -15,6 +15,7 @@ import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

@@ -1,7 +1,7 @@
 package com.tlnacl.reactiveapp
 
 import com.tlnacl.reactiveapp.ui.home.HomeFragment
-import com.tlnacl.reactiveapp.ui.shop.SearchFragment
+import com.tlnacl.reactiveapp.ui.search.SearchFragment
 import com.tlnacl.reactiveapp.ui.shop.ShopActivity
 import dagger.Component
 import javax.inject.Singleton

@@ -9,6 +9,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.ui.home.HomeFragment
+import com.tlnacl.reactiveapp.ui.search.SearchFragment
 
 class ShopActivity : AppCompatActivity() {
     @BindView(R.id.toolbar) lateinit var toolbar: Toolbar

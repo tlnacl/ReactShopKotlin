@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp.ui.shop
+package com.tlnacl.reactiveapp.ui.search
 
 /**
  * Created by tomt on 23/06/17.

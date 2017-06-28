@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp.ui.shop
+package com.tlnacl.reactiveapp.ui.search
 
 import com.jakewharton.rxrelay2.PublishRelay
 import com.tlnacl.reactiveapp.businesslogic.searchengine.SearchEngine

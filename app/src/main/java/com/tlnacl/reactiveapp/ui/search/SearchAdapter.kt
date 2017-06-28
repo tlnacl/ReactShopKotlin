@@ -1,9 +1,10 @@
-package com.tlnacl.reactiveapp.ui.shop
+package com.tlnacl.reactiveapp.ui.search
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 
 /**
  * Created by tomt on 21/06/17.
