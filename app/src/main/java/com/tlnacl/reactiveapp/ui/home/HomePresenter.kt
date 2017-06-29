@@ -2,6 +2,7 @@ package com.tlnacl.reactiveapp.ui.home
 
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.ui.BasePresenter
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -21,6 +22,12 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
         }
     }
 
+    fun handleUiEvent(homeUiEvent: Observable<HomeUiEvent>){
+        homeUiEvent.flatMap { handleUiEvent(it) }
+                .subscribe { mvpView?.render(it) }
+        }
+
+
     private fun loadFirstPage() {
         feedLoader.loadFirstPage()
                 .doOnNext { Timber.d("feedItems:" + it) }
@@ -29,7 +36,6 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .startWith (HomeViewState(loadingFirstPage = true))
-                .subscribe { mvpView?.render(it) }
 
     }
 

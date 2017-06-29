@@ -65,6 +65,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
         presenter.handleUiEvent(HomeUiEvent.LoadFirstPage)
+        adapter.loadMoreItemsOfCategoryObservable().
     }
 
     override fun onProductClicked(product: Product) {
