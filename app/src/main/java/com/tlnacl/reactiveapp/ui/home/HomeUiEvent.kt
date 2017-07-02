@@ -7,5 +7,5 @@ sealed class HomeUiEvent {
     object LoadFirstPage : HomeUiEvent()
     object LoadNextPage : HomeUiEvent()
     object PullToRefresh : HomeUiEvent()
-    data class LoadAllProductsFromCategory(val categoryName: String)
+    data class LoadAllProductsFromCategory(val categoryName: String) : HomeUiEvent()
 }

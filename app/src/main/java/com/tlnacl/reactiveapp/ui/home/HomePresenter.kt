@@ -14,22 +14,34 @@ import javax.inject.Inject
  */
 class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePresenter<HomeView>() {
     private var startDisposables = CompositeDisposable()
+    private val homeViewState = HomeViewState(loadingFirstPage = true)
 
 
-    fun handleUiEvent(homeUiEvent: HomeUiEvent){
+    fun transferEvent(homeUiEvent: HomeUiEvent):Observable<HomeViewState>{
         when(homeUiEvent){
-            is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+            is HomeUiEvent.LoadFirstPage -> return loadFirstPage()
+            is HomeUiEvent.LoadAllProductsFromCategory -> return loadAllProductsFromCategory(homeUiEvent.categoryName)
+            else -> { return Observable.just(HomeViewState())}
         }
     }
 
+    private fun loadAllProductsFromCategory(categoryName: String): Observable<HomeViewState> {
+        return feedLoader.loadProductsOfCategory(categoryName)
+                .map { feedItems -> HomeViewState(data = feedItems) }
+                .onErrorReturn { HomeViewState(firstPageError = it) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .startWith (HomeViewState(loadingFirstPage = true))
+    }
+
     fun handleUiEvent(homeUiEvent: Observable<HomeUiEvent>){
-        homeUiEvent.flatMap { handleUiEvent(it) }
+        homeUiEvent.flatMap { transferEvent(it) }
                 .subscribe { mvpView?.render(it) }
         }
 
 
-    private fun loadFirstPage() {
-        feedLoader.loadFirstPage()
+    private fun loadFirstPage():Observable<HomeViewState> {
+        return feedLoader.loadFirstPage()
                 .doOnNext { Timber.d("feedItems:" + it) }
                 .map { feedItems -> HomeViewState(data = feedItems)}
                 .onErrorReturn { HomeViewState(firstPageError = it) }

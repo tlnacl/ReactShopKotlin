@@ -18,6 +18,7 @@ import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
+import io.reactivex.Observable
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,8 +65,8 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
-        presenter.handleUiEvent(HomeUiEvent.LoadFirstPage)
-        adapter.loadMoreItemsOfCategoryObservable().
+        presenter.handleUiEvent(Observable.just(HomeUiEvent.LoadFirstPage))
+        presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
     }
 
     override fun onProductClicked(product: Product) {

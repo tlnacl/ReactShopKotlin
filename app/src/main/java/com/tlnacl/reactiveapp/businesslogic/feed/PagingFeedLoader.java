@@ -46,7 +46,7 @@ public class PagingFeedLoader {
   public Observable<List<Product>> newestPage() {
     if (newestPageLoaded) {
       return Observable.fromCallable(() -> {
-        Thread.sleep(2000);
+        Thread.sleep(1000);
         return Collections.emptyList();
       });
     }
