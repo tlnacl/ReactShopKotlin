@@ -7,7 +7,7 @@ abstract class BasePresenter<T : MvpView> {
 
     var mvpView: T? = null
 
-    fun attachView(mvpView: T) {
+    open fun attachView(mvpView: T) {
         this.mvpView = mvpView
     }
 
