@@ -26,7 +26,6 @@ import javax.inject.Inject
  */
 class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
     override fun onProductClicked(product: Product) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //        ProductDetailsActivity.start(activity, product)
     }
 

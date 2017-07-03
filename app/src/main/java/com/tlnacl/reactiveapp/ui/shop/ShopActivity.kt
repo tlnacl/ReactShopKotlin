@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.ui.home.HomeFragment
@@ -13,7 +12,7 @@ import com.tlnacl.reactiveapp.ui.search.SearchFragment
 
 class ShopActivity : AppCompatActivity() {
     @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
-    @BindView(R.id.sliding_layout) lateinit var slidingUpPanel: SlidingUpPanelLayout
+//    @BindView(R.id.sliding_layout) lateinit var slidingUpPanel: SlidingUpPanelLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +36,11 @@ class ShopActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, HomeFragment()).commit()
     }
 
-    private fun closeSlidingUpPanelIfOpen(): Boolean {
-        if (slidingUpPanel.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
-            slidingUpPanel.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
-            return true
-        }
-        return false
-    }
+//    private fun closeSlidingUpPanelIfOpen(): Boolean {
+//        if (slidingUpPanel.panelState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+//            slidingUpPanel.panelState = SlidingUpPanelLayout.PanelState.COLLAPSED
+//            return true
+//        }
+//        return false
+//    }
 }
