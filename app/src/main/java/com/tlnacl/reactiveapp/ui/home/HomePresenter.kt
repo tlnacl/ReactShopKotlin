@@ -24,18 +24,19 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     override fun attachView(mvpView: HomeView) {
         super.attachView(mvpView)
         startDisposables.add(changeRelay
-                .scan (HomeViewState(loadingFirstPage = true),{ homeViewState, stateChange ->
-                    when(stateChange){
+                .scan(HomeViewState(loadingFirstPage = true), { homeViewState, stateChange ->
+                    when (stateChange) {
                         is StateChange.FirstPageLoading -> HomeViewState(loadingFirstPage = true)
                         is StateChange.FirstPageLoaded -> HomeViewState(data = stateChange.data)
                         is StateChange.FirstPageError -> HomeViewState(firstPageError = stateChange.error)
-                        is StateChange.ProductsOfCategoryLoading -> handleProductsOfCategoryLoading(homeViewState,stateChange)
-                        is StateChange.ProductsOfCategoryLoaded -> handleProductsOfCategoryLoaded(homeViewState,stateChange)
-                        is StateChange.ProductsOfCategoryError -> handleProductsOfCategoryError(homeViewState,stateChange)
+                        is StateChange.ProductsOfCategoryLoading -> handleProductsOfCategoryLoading(homeViewState, stateChange)
+                        is StateChange.ProductsOfCategoryLoaded -> handleProductsOfCategoryLoaded(homeViewState, stateChange)
+                        is StateChange.ProductsOfCategoryError -> handleProductsOfCategoryError(homeViewState, stateChange)
                         else -> homeViewState//just handle 2 case now
                     }
 
                 })
+                .doOnNext { Timber.d("changeRelay:" + it) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { mvpView?.render(it) })
     }
@@ -93,35 +94,35 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
         return homeViewState.copy(data = data)
     }
 
-    private fun loadAllProductsFromCategory(categoryName: String) {
-        feedLoader.loadProductsOfCategory(categoryName)
-                .map<LoadCategoryResult> { feedItems -> LoadCategoryResult.Success(feedItems) }
-                .onErrorReturn { LoadCategoryResult.Error }
+    private fun loadAllProductsFromCategory(categoryName: String): Observable<StateChange> {
+        return feedLoader.loadProductsOfCategory(categoryName)
+                .map<StateChange> { StateChange.ProductsOfCategoryLoaded(categoryName, it) }
+                .onErrorReturn { StateChange.ProductsOfCategoryError(categoryName, it) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .startWith (LoadCategoryResult.Loading)
-                .subscribe { changeRelay }
+                .startWith(StateChange.ProductsOfCategoryLoading(categoryName))
     }
 
-    fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>){
-        homeUiEventObservable.map { homeUiEvent ->
-            when(homeUiEvent){
+    fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
+        homeUiEventObservable.flatMap { homeUiEvent ->
+            when (homeUiEvent) {
                 is HomeUiEvent.LoadFirstPage -> loadFirstPage()
                 is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
+                else -> loadFirstPage()
             }
-        }
-        }
+        }.subscribe(changeRelay)
+    }
 
-    private fun loadFirstPage() {
+    private fun loadFirstPage(): Observable<StateChange> {
         Timber.d("loadFirstPage")
-        feedLoader.loadFirstPage()
+        return feedLoader.loadFirstPage()
                 .doOnNext { Timber.d("feedItems:" + it) }
-                .map<StateChange> { StateChange.FirstPageLoaded(it)}
+                .map<StateChange> { StateChange.FirstPageLoaded(it) }
                 .onErrorReturn { StateChange.FirstPageError(it) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .startWith (StateChange.FirstPageLoading)
-                .subscribe { changeRelay }
+                .startWith(StateChange.FirstPageLoading)
+
 
     }
 
