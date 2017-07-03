@@ -19,8 +19,8 @@ import io.reactivex.subjects.PublishSubject
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener):
-        RecyclerView.Adapter<RecyclerView.ViewHolder>(),MoreItemsViewHolder.LoadItemsClickListener{
+class HomeAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>(), MoreItemsViewHolder.LoadItemsClickListener {
 
     companion object {
         val VIEW_TYPE_PRODUCT = 0
@@ -37,30 +37,30 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
         return items
     }
 
-    override fun getItemCount()= items.size
+    override fun getItemCount() = items.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):RecyclerView.ViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
-            VIEW_TYPE_PRODUCT -> return ProductViewHolder(context,parent, callback)
-            VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder.create(LayoutInflater.from(context))
-            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder.create(LayoutInflater.from(context), this)
-            VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder.create(LayoutInflater.from(context))
+            VIEW_TYPE_PRODUCT -> return ProductViewHolder(context, parent, callback)
+            VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder(context, parent)
+            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(context, parent, this)
+            VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder(context, parent)
         }
 
         throw IllegalArgumentException("Couldn't create a ViewHolder for viewType  = " + viewType)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int){
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is LoadingViewHolder) {
             return
         }
 
         val item = items[position]
-        when(holder){
+        when (holder) {
             is ProductViewHolder -> holder.bind(item as Product)
             is SectionHederViewHolder -> holder.onBind(item as SectionHeader)
             is MoreItemsViewHolder -> holder.bind(item as AdditionalItemsLoadable)
-            else ->  throw IllegalArgumentException("couldn't accept  ViewHolder " + holder)
+            else -> throw IllegalArgumentException("couldn't accept  ViewHolder " + holder)
         }
     }
 
@@ -123,7 +123,7 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
         val oldItems = this.items
         this.items = newItems
 
-        if (oldItems == null) {
+        if (oldItems.isEmpty()) {
             notifyDataSetChanged()
         } else {
             // Use Diff utils
@@ -142,20 +142,19 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
 
                     if (oldItem is Product
                             && newItem is Product
-                            && oldItem.id === newItem.id) {
+                            && oldItem.id == newItem.id) {
                         return true
                     }
 
                     if (oldItem is SectionHeader
                             && newItem is SectionHeader
-                            && oldItem.getName().equals(newItem.getName())) {
+                            && oldItem.name == newItem.name) {
                         return true
                     }
 
                     if (oldItem is AdditionalItemsLoadable
                             && newItem is AdditionalItemsLoadable
-                            && oldItem.getCategoryName()
-                            .equals(newItem.getCategoryName())) {
+                            && oldItem.categoryName == newItem.categoryName) {
                         return true
                     }
 
@@ -171,5 +170,4 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
             }, true).dispatchUpdatesTo(this)
         }
     }
-
 }

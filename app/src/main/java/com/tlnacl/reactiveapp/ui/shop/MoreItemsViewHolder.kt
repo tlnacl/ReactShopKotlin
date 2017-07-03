@@ -1,8 +1,10 @@
 package com.tlnacl.reactiveapp.ui.shop
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import butterknife.BindView
@@ -10,7 +12,8 @@ import butterknife.ButterKnife
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 
-class MoreItemsViewHolder constructor(itemView: View, listener: LoadItemsClickListener) : RecyclerView.ViewHolder(itemView) {
+class MoreItemsViewHolder (context: Context, parent: ViewGroup, val callback: LoadItemsClickListener)
+    : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false)) {
 
     interface LoadItemsClickListener {
         fun loadItemsForCategory(category: String)
@@ -25,9 +28,9 @@ class MoreItemsViewHolder constructor(itemView: View, listener: LoadItemsClickLi
 
     init {
         ButterKnife.bind(this, itemView)
-        itemView.setOnClickListener {listener.loadItemsForCategory(currentItem!!.categoryName) }
-        errorRetry.setOnClickListener {listener.loadItemsForCategory(currentItem!!.categoryName) }
-        loadMoreButton.setOnClickListener {listener.loadItemsForCategory(currentItem!!.categoryName) }
+        itemView.setOnClickListener {callback.loadItemsForCategory(currentItem!!.categoryName) }
+        errorRetry.setOnClickListener {callback.loadItemsForCategory(currentItem!!.categoryName) }
+        loadMoreButton.setOnClickListener {callback.loadItemsForCategory(currentItem!!.categoryName) }
     }
 
     fun bind(item: AdditionalItemsLoadable) {
@@ -54,15 +57,6 @@ class MoreItemsViewHolder constructor(itemView: View, listener: LoadItemsClickLi
             loadingView.visibility = View.GONE
             errorRetry.visibility = View.GONE
             itemView.isClickable = true
-        }
-    }
-
-    companion object {
-
-        fun create(layoutInflater: LayoutInflater,
-                   clickListener: LoadItemsClickListener): MoreItemsViewHolder {
-            return MoreItemsViewHolder(
-                    layoutInflater.inflate(R.layout.item_more_available, null, false), clickListener)
         }
     }
 }
