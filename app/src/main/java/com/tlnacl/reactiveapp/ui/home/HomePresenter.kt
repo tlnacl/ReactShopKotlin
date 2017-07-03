@@ -21,8 +21,7 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     private var startDisposables = CompositeDisposable()
     private val changeRelay = PublishRelay.create<StateChange>()
 
-    override fun attachView(mvpView: HomeView) {
-        super.attachView(mvpView)
+    init {
         startDisposables.add(changeRelay
                 .scan(HomeViewState(loadingFirstPage = true), { homeViewState, stateChange ->
                     when (stateChange) {
@@ -46,6 +45,10 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .subscribe { mvpView?.render(it) })
     }
 
+    override fun attachView(mvpView: HomeView) {
+        super.attachView(mvpView)
+    }
+
     fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
         homeUiEventObservable
                 .doOnNext { Timber.i("homeUiEvent:" + it) }
@@ -65,7 +68,6 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .map<StateChange> { StateChange.FirstPageLoaded(it) }
                 .onErrorReturn { StateChange.FirstPageError(it) }
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .startWith(StateChange.FirstPageLoading)
     }
 
@@ -75,7 +77,6 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .map<StateChange> { StateChange.ProductsOfCategoryLoaded(categoryName, it) }
                 .onErrorReturn { StateChange.ProductsOfCategoryError(categoryName, it) }
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .startWith(StateChange.ProductsOfCategoryLoading(categoryName))
     }
 
@@ -85,7 +86,6 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .map<StateChange> { StateChange.NextPageLoaded(it) }
                 .onErrorReturn { StateChange.NextPageError(it) }
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .startWith(StateChange.NextPageLoading)
     }
 
@@ -95,7 +95,6 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
                 .map<StateChange> { StateChange.PullToRefreshLoaded(it) }
                 .onErrorReturn { StateChange.PullToRefreshError(it) }
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .startWith(StateChange.PullToRefreshLoading)
     }
 
