@@ -7,8 +7,8 @@ import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
  */
 data class HomeViewState(val loadingFirstPage: Boolean = false,
                          val firstPageError: Throwable? = null,
-                         val data: List<FeedItem> = emptyList(),
                          val loadingNextPage: Boolean = false,
                          val nextPageError: Throwable? = null,
                          val loadingPullToRefresh: Boolean = false,
-                         val pullToRefreshError: Throwable? = null)
+                         val pullToRefreshError: Throwable? = null,
+                         val data: List<FeedItem> = emptyList())

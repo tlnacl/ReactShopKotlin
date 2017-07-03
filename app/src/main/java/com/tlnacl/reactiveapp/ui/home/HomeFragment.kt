@@ -13,6 +13,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
@@ -32,7 +34,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
 
-    private lateinit var adapter:HomeAdapter
+    private lateinit var adapter: HomeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +69,12 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         recyclerView.layoutManager = layoutManager
         presenter.handleUiEvent(Observable.just(HomeUiEvent.LoadFirstPage))
         presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
+        presenter.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
+                .filter { !adapter.isLoadingNextPage() }
+                .filter { it == RecyclerView.SCROLL_STATE_IDLE }
+                .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
+                .map { HomeUiEvent.LoadNextPage })
+        presenter.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })
     }
 
     override fun onProductClicked(product: Product) {
@@ -74,7 +82,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun render(viewState: HomeViewState) {
-        Timber.d("render %s", viewState)
+        Timber.i("render %s", viewState)
         if (!viewState.loadingFirstPage && viewState.firstPageError == null) {
             renderShowData(viewState)
         } else if (viewState.loadingFirstPage) {

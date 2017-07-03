@@ -65,8 +65,10 @@ dependencies {
     compile "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    compile "com.jakewharton.rxbinding2:rxbinding:$rxBindingVersion"
     compile "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxBindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:$rxBindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-design-kotlin:$rxBindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxBindingVersion"
 
     compile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
     compile 'io.reactivex.rxjava2:rxjava:2.1.0'
