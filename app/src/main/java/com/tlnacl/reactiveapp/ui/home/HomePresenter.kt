@@ -22,6 +22,7 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     private val changeRelay = PublishRelay.create<StateChange>()
 
     init {
+        Timber.i("init HomePresenter")
         startDisposables.add(changeRelay
                 .scan(HomeViewState(loadingFirstPage = true), { homeViewState, stateChange ->
                     when (stateChange) {

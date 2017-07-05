@@ -35,6 +35,7 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
     @BindView(R.id.errorView) lateinit var errorView: TextView
     @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
     @BindView(R.id.emptyView) lateinit var emptyView: View
+    var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
 
@@ -56,10 +57,11 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        spanCount = resources.getInteger(R.integer.grid_span_size)
         adapter = SearchAdapter(activity, this)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(activity, 2)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(2,
+        recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
+        recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
         presenter.handleUiEvent(RxSearchView.queryTextChanges(searchView)

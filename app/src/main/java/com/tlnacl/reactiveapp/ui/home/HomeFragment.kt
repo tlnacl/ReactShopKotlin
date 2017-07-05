@@ -2,7 +2,6 @@ package com.tlnacl.reactiveapp.ui.home
 
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.transition.TransitionManager
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.GridLayoutManager
@@ -33,12 +32,14 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
+    var spanCount: Int = 2
 
     private lateinit var adapter: HomeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity.application as AndroidApplication).appComponent.inject(this)
+        retainInstance = true
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -50,18 +51,19 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var layoutManager = GridLayoutManager(activity, 2)
+        spanCount = resources.getInteger(R.integer.grid_span_size)
+        var layoutManager = GridLayoutManager(activity, spanCount)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 val viewType = adapter.getItemViewType(position)
                 if (viewType == HomeAdapter.VIEW_TYPE_LOADING_MORE_NEXT_PAGE || viewType == HomeAdapter.VIEW_TYPE_SECTION_HEADER) {
-                    return 2
+                    return spanCount
                 }
                 return 1
             }
         }
         adapter = HomeAdapter(activity, this)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(2,
+        recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
         recyclerView.adapter = adapter
@@ -94,7 +96,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     private fun renderShowData(state: HomeViewState) {
-        TransitionManager.beginDelayedTransition(view as ViewGroup)
+//        TransitionManager.beginDelayedTransition(view as ViewGroup)
         loadingView.visibility = View.GONE
         errorView.visibility = View.GONE
         swipeRefreshLayout.visibility = View.VISIBLE
@@ -127,14 +129,14 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     private fun renderFirstPageLoading() {
-        TransitionManager.beginDelayedTransition(view as ViewGroup)
+//        TransitionManager.beginDelayedTransition(view as ViewGroup)
         loadingView.visibility = View.VISIBLE
         errorView.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
     }
 
     private fun renderFirstPageError() {
-        TransitionManager.beginDelayedTransition(view as ViewGroup)
+//        TransitionManager.beginDelayedTransition(view as ViewGroup)
         loadingView.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
         errorView.visibility = View.VISIBLE
