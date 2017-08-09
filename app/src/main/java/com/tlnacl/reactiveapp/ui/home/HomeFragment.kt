@@ -1,5 +1,6 @@
 package com.tlnacl.reactiveapp.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -17,6 +18,7 @@ import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import io.reactivex.Observable
@@ -80,7 +82,9 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun onProductClicked(product: Product) {
-//        ProductDetailsActivity.start(activity, product)
+        val i = Intent(activity, ProductDetailsActivity::class.java)
+        i.putExtra("productId", product.id)
+        activity.startActivity(i)
     }
 
     override fun render(viewState: HomeViewState) {

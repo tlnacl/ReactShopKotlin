@@ -1,5 +1,6 @@
 package com.tlnacl.reactiveapp.ui.search
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.transition.TransitionManager
 import android.support.v4.app.Fragment
@@ -15,6 +16,7 @@ import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import timber.log.Timber
@@ -26,7 +28,9 @@ import javax.inject.Inject
  */
 class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
     override fun onProductClicked(product: Product) {
-//        ProductDetailsActivity.start(activity, product)
+        val i = Intent(activity, ProductDetailsActivity::class.java)
+        i.putExtra("productId", product.id)
+        activity.startActivity(i)
     }
 
     @BindView(R.id.searchView) lateinit var searchView: android.widget.SearchView

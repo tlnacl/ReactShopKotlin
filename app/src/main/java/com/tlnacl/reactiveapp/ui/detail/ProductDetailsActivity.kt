@@ -17,7 +17,6 @@ import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import com.tlnacl.reactiveapp.ui.home.HomePresenter
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -30,7 +29,7 @@ class ProductDetailsActivity : AppCompatActivity() ,ProductDetailsView{
     private var product: Product? = null
     private var isProductInshoppingCart = false
 
-    @Inject lateinit var presenter: HomePresenter
+    @Inject lateinit var presenter: ProductDetailsPresenter
     @BindView(R.id.errorView) lateinit var errorView: View
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.detailsView) lateinit var detailsView: View
@@ -49,7 +48,11 @@ class ProductDetailsActivity : AppCompatActivity() ,ProductDetailsView{
         (application as AndroidApplication).appComponent.inject(this)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        presenter.attachView(this)
+        Timber.d("onCreate")
+        presenter.initState()
 
+        presenter.handleUiEvent(intent.getIntExtra(KEY_PRODUCT_ID,0))
 //        fabClickObservable = RxView.clicks(fab).share().map { ignored -> true }
     }
 

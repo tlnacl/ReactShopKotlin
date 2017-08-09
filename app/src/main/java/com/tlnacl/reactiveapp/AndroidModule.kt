@@ -24,7 +24,7 @@ class AndroidModule(private val context: Context) {
         if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor { message -> Timber.d(message) }
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-//      httpClientBuilder.addInterceptor(loggingInterceptor)
+      httpClientBuilder.addInterceptor(loggingInterceptor)
             httpClientBuilder.addNetworkInterceptor(StethoInterceptor())
         }
 
