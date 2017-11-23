@@ -3,7 +3,6 @@ package com.tlnacl.reactiveapp.ui.home
 import android.content.Context
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
@@ -43,7 +42,7 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
         when (viewType) {
             VIEW_TYPE_PRODUCT -> return ProductViewHolder(context, parent, callback)
             VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder(context, parent)
-            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(context, parent, this)
+            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(context, this)
             VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder(context, parent)
         }
 

@@ -56,12 +56,12 @@ class ProductDetailsActivity : AppCompatActivity() ,ProductDetailsView{
 //        fabClickObservable = RxView.clicks(fab).share().map { ignored -> true }
     }
 
-    override fun render(state: ProductDetailsViewState) {
-        Timber.d("render " + state)
+    override fun render(productDetailsViewState: ProductDetailsViewState) {
+        Timber.d("render " + productDetailsViewState)
 
-        when(state){
+        when(productDetailsViewState){
             is ProductDetailsViewState.Loading -> renderLoading()
-            is ProductDetailsViewState.Data -> renderData(state)
+            is ProductDetailsViewState.Data -> renderData(productDetailsViewState)
             is ProductDetailsViewState.Error -> renderError()
         }
     }

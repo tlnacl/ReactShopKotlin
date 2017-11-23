@@ -87,16 +87,16 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         activity.startActivity(i)
     }
 
-    override fun render(viewState: HomeViewState) {
-        Timber.i("render %s", viewState)
-        if (!viewState.loadingFirstPage && viewState.firstPageError == null) {
-            renderShowData(viewState)
-        } else if (viewState.loadingFirstPage) {
+    override fun render(homeViewState: HomeViewState) {
+        Timber.i("render %s", homeViewState)
+        if (!homeViewState.loadingFirstPage && homeViewState.firstPageError == null) {
+            renderShowData(homeViewState)
+        } else if (homeViewState.loadingFirstPage) {
             renderFirstPageLoading()
-        } else if (viewState.firstPageError != null) {
+        } else if (homeViewState.firstPageError != null) {
             renderFirstPageError()
         } else {
-            throw IllegalStateException("Unknown view state " + viewState)
+            throw IllegalStateException("Unknown view state " + homeViewState)
         }
     }
 

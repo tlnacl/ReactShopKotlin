@@ -2,14 +2,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
-apply plugin: 'me.tatarka.retrolambda'
-
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    buildToolsVersion "26.0.2"
 
     compileOptions {
-        // For retrolambda support
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -36,7 +33,7 @@ dependencies {
     def retrofitVersion = '2.3.0'
     def okHttpVersion = '3.8.0'
     def supportLibVersion = '25.3.1'
-    def butterKnifeVersion = '8.5.1'
+    def butterKnifeVersion = '8.8.1'
     def daggerVersion = '2.10'
     def rxBindingVersion = '2.0.0'
 
@@ -71,7 +68,7 @@ dependencies {
     compile "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxBindingVersion"
 
     compile 'com.facebook.stetho:stetho-okhttp3:1.4.2'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.3'
     compile 'com.jakewharton.timber:timber:4.5.1'
     compile 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
     compile 'com.sothree.slidinguppanel:library:3.3.1'
