@@ -3,14 +3,37 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: openjdk:8
+image: java:8
 
 pipelines:
   default:
     - step:
         caches:
           - gradle
-        script: # Modify the commands below to build your repository.
-          # You must commit the Gradle wrapper to your repository
-          # https://docs.gradle.org/current/userguide/gradle_wrapper.html
-          - bash ./gradlew build
+          - android-sdk
+
+        script:
+          # Download and unzip android sdk
+          - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+          - unzip -o -qq android-sdk.zip -d android-sdk
+
+          # Define Android Home and add PATHs
+          - export ANDROID_HOME="/opt/atlassian/pipelines/agent/build/android-sdk"
+          - export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+          # Download packages.
+          - yes | sdkmanager "platform-tools"
+          - yes | sdkmanager "platforms;android-27"
+          - yes | sdkmanager "build-tools;27.0.3"
+          - yes | sdkmanager "extras;android;m2repository"
+          - yes | sdkmanager "extras;google;m2repository"
+          - yes | sdkmanager "extras;google;instantapps"
+          - yes | sdkmanager --licenses
+
+          # Build apk
+          - chmod a+x ./gradlew
+          - ./gradlew assembleDebug
+
+definitions:
+  caches:
+    android-sdk: android-sdk
