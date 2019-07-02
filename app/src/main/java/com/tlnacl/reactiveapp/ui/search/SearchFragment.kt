@@ -2,10 +2,10 @@ package com.tlnacl.reactiveapp.ui.search
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.transition.TransitionManager
-import android.support.v4.app.Fragment
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.transition.TransitionManager
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +26,7 @@ import javax.inject.Inject
 /**
  * Created by tomt on 21/06/17.
  */
-class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
+class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
     override fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
@@ -37,7 +37,7 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
     @BindView(R.id.container) lateinit var container: ViewGroup
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
-    @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
+    @BindView(R.id.recyclerView) lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.emptyView) lateinit var emptyView: View
     var spanCount: Int = 2
 
@@ -64,7 +64,7 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
         spanCount = resources.getInteger(R.integer.grid_span_size)
         adapter = SearchAdapter(activity!!, this)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
+        recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity, spanCount)
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 

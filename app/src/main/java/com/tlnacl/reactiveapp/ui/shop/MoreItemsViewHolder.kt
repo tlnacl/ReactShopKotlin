@@ -1,7 +1,7 @@
 package com.tlnacl.reactiveapp.ui.shop
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -12,7 +12,7 @@ import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 
 class MoreItemsViewHolder (context: Context, private val callback: LoadItemsClickListener)
-    : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false)) {
+    : androidx.recyclerview.widget.RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false)) {
 
     interface LoadItemsClickListener {
         fun loadItemsForCategory(category: String)

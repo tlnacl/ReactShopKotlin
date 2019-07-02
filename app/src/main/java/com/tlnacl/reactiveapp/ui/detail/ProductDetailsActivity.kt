@@ -1,18 +1,19 @@
 package com.tlnacl.reactiveapp.ui.detail
 
 import android.os.Bundle
-import android.support.design.widget.CollapsingToolbarLayout
-import android.support.design.widget.FloatingActionButton
-import android.support.transition.TransitionManager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.transition.TransitionManager
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
@@ -93,8 +94,8 @@ class ProductDetailsActivity : AppCompatActivity() ,ProductDetailsView{
         }
 
         Glide.with(this)
-                .load<Any>(Constants.BASE_IMAGE_URL + product?.image)
-                .centerCrop()
+                .load(Constants.BASE_IMAGE_URL + product?.image)
+                .apply(RequestOptions.centerCropTransform())
                 .into(backdrop)
     }
 

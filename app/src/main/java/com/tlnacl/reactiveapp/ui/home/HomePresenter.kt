@@ -1,6 +1,6 @@
 package com.tlnacl.reactiveapp.ui.home
 
-import android.support.v4.util.Pair
+import androidx.core.util.Pair
 import com.jakewharton.rxrelay2.PublishRelay
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable

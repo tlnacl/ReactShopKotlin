@@ -17,7 +17,7 @@
 
 package com.tlnacl.reactiveapp.businesslogic.searchengine;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator;
 import com.tlnacl.reactiveapp.businesslogic.model.Product;

@@ -17,7 +17,7 @@
 
 package com.tlnacl.reactiveapp.businesslogic.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * A section header used to group elemens
