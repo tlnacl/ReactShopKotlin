@@ -58,7 +58,7 @@ class ProductDetailsActivity : AppCompatActivity() ,ProductDetailsView{
     }
 
     override fun render(productDetailsViewState: ProductDetailsViewState) {
-        Timber.d("render " + productDetailsViewState)
+        Timber.d("render $productDetailsViewState")
 
         when(productDetailsViewState){
             is ProductDetailsViewState.Loading -> renderLoading()
