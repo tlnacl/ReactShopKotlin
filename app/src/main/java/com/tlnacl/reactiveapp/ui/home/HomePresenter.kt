@@ -116,13 +116,13 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     private fun handleProductsOfCategoryError(homeViewState: HomeViewState, stateChange: StateChange.ProductsOfCategoryError): HomeViewState {
         val found = findAdditionalItems(stateChange.categoryName, homeViewState.data)
         val foundItem = found.second
-        val toInsert = AdditionalItemsLoadable(foundItem.moreItemsAvailableCount,
+        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount,
                 foundItem.categoryName, false,
                 stateChange.error)
 
         val data = ArrayList<FeedItem>(homeViewState.data.size)
         data.addAll(homeViewState.data)
-        data[found.first] = toInsert
+        data[found.first!!] = toInsert
         return homeViewState.copy(data = data)
     }
 
@@ -134,7 +134,7 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
 
         // Search for the section header
         var sectionHeaderIndex = -1
-        for (i in found.first downTo 0) {
+        for (i in found.first!! downTo 0) {
             val item = homeViewState.data[i]
             if (item is SectionHeader && item.name
                     .equals(stateChange.categoryName)) {
@@ -157,12 +157,12 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     private fun handleProductsOfCategoryLoading(homeViewState: HomeViewState, stateChange: StateChange.ProductsOfCategoryLoading): HomeViewState {
         val found = findAdditionalItems(stateChange.categoryName, homeViewState.data)
         val foundItem = found.second
-        val toInsert = AdditionalItemsLoadable(foundItem.moreItemsAvailableCount,
+        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount,
                 foundItem.categoryName, true, null)
 
         val data = ArrayList<FeedItem>(homeViewState.data.size)
         data.addAll(homeViewState.data)
-        data[found.first] = toInsert
+        data[found.first!!] = toInsert
         return homeViewState.copy(data = data)
     }
 
@@ -176,7 +176,7 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
     private fun findAdditionalItems(categoryName: String,
                                     items: List<FeedItem>): Pair<Int, AdditionalItemsLoadable> {
         val size = items.size
-        for (i in 0..size - 1) {
+        for (i in 0 until size) {
             val item = items[i]
             if (item is AdditionalItemsLoadable && item.categoryName.equals(categoryName)) {
                 return Pair.create(i, item)

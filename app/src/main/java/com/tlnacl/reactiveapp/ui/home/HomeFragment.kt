@@ -41,10 +41,10 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("HomeFragment OnCreate")
-        (activity.application as AndroidApplication).appComponent.inject(this)
+        (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater?.inflate(R.layout.fragment_home, container, false)
         Timber.d("HomeFragment onCreateView")
         ButterKnife.bind(this, view!!)
@@ -52,7 +52,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         return view
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         spanCount = resources.getInteger(R.integer.grid_span_size)
         var layoutManager = GridLayoutManager(activity, spanCount)
@@ -65,7 +65,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
                 return 1
             }
         }
-        adapter = HomeAdapter(activity, this)
+        adapter = HomeAdapter(activity!!, this)
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
@@ -84,7 +84,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     override fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
-        activity.startActivity(i)
+        activity!!.startActivity(i)
     }
 
     override fun render(homeViewState: HomeViewState) {
