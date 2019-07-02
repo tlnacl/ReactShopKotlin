@@ -30,7 +30,7 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
     override fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
-        activity.startActivity(i)
+        activity!!.startActivity(i)
     }
 
     @BindView(R.id.searchView) lateinit var searchView: android.widget.SearchView
@@ -47,11 +47,11 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity.application as AndroidApplication).appComponent.inject(this)
+        (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_search, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_search, container, false)
         ButterKnife.bind(this, view!!)
         //? how about init state at attachview ??
         presenter.attachView(this)
@@ -59,10 +59,10 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
         return view
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         spanCount = resources.getInteger(R.integer.grid_span_size)
-        adapter = SearchAdapter(activity, this)
+        adapter = SearchAdapter(activity!!, this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
