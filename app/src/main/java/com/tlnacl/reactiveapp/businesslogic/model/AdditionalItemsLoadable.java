@@ -17,8 +17,8 @@
 
 package com.tlnacl.reactiveapp.businesslogic.model;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * This is a indicator that also some more items are available that could be loaded

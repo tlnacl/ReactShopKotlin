@@ -2,17 +2,14 @@ package com.tlnacl.reactiveapp.ui.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.android.material.snackbar.Snackbar
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.tlnacl.reactiveapp.AndroidApplication
@@ -28,10 +25,10 @@ import javax.inject.Inject
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
+class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
     @Inject lateinit var presenter: HomePresenter
-    @BindView(R.id.swipeRefreshLayout) lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
+    @BindView(R.id.swipeRefreshLayout) lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    @BindView(R.id.recyclerView) lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
     var spanCount: Int = 2
@@ -45,7 +42,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater?.inflate(R.layout.fragment_home, container, false)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
         Timber.d("HomeFragment onCreateView")
         ButterKnife.bind(this, view!!)
         presenter.attachView(this)
@@ -55,8 +52,8 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         spanCount = resources.getInteger(R.integer.grid_span_size)
-        var layoutManager = GridLayoutManager(activity, spanCount)
-        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        var layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity, spanCount)
+        layoutManager.spanSizeLookup = object : androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 val viewType = adapter.getItemViewType(position)
                 if (viewType == HomeAdapter.VIEW_TYPE_LOADING_MORE_NEXT_PAGE || viewType == HomeAdapter.VIEW_TYPE_SECTION_HEADER) {
@@ -75,7 +72,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
         presenter.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
                 .filter { !adapter.isLoadingNextPage() }
-                .filter { it == RecyclerView.SCROLL_STATE_IDLE }
+                .filter { it == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE }
                 .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
                 .map { HomeUiEvent.LoadNextPage })
         presenter.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })

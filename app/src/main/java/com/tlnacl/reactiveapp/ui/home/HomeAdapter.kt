@@ -1,8 +1,8 @@
 package com.tlnacl.reactiveapp.ui.home
 
 import android.content.Context
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
@@ -19,7 +19,7 @@ import io.reactivex.subjects.PublishSubject
  * Created by tomt on 27/06/17.
  */
 class HomeAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>(), MoreItemsViewHolder.LoadItemsClickListener {
+        androidx.recyclerview.widget.RecyclerView.Adapter<androidx.recyclerview.widget.RecyclerView.ViewHolder>(), MoreItemsViewHolder.LoadItemsClickListener {
 
     companion object {
         val VIEW_TYPE_PRODUCT = 0
@@ -38,7 +38,7 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
 
     override fun getItemCount() = items.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
         when (viewType) {
             VIEW_TYPE_PRODUCT -> return ProductViewHolder(context, parent, callback)
             VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder(context, parent)
@@ -49,7 +49,7 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
         throw IllegalArgumentException("Couldn't create a ViewHolder for viewType  = " + viewType)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
         if (holder is LoadingViewHolder) {
             return
         }
