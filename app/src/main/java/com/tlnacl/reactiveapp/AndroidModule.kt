@@ -13,6 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import javax.inject.Singleton
 
+
+
 @Module
 class AndroidModule(private val context: Context) {
 
@@ -26,7 +28,11 @@ class AndroidModule(private val context: Context) {
         val httpClientBuilder = OkHttpClient.Builder()
 
         if (BuildConfig.DEBUG) {
-            val loggingInterceptor = HttpLoggingInterceptor { message -> Timber.d(message) }
+            val loggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
+                override fun log(message: String) {
+                    Timber.tag("OkHttp").d(message)
+                }
+            })
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
             httpClientBuilder.addInterceptor(loggingInterceptor)
             httpClientBuilder.addNetworkInterceptor(StethoInterceptor())
@@ -35,7 +41,7 @@ class AndroidModule(private val context: Context) {
         val restAdapter = Retrofit.Builder()
                 .baseUrl(BuildConfig.API_ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//CoroutineCallAdapterFactory()
                 .client(httpClientBuilder.build())
                 .build()
         return restAdapter.create(ProductBackendApi::class.java)
