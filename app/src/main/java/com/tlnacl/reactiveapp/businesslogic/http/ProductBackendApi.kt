@@ -15,23 +15,20 @@
  *
  */
 
-package com.tlnacl.reactiveapp.businesslogic.http;
+package com.tlnacl.reactiveapp.businesslogic.http
 
-import com.tlnacl.reactiveapp.businesslogic.model.Product;
+import com.tlnacl.reactiveapp.businesslogic.model.Product
 
-import java.util.List;
-
-import io.reactivex.Observable;
-import retrofit2.http.GET;
-import retrofit2.http.Path;
+import io.reactivex.Observable
+import retrofit2.http.GET
+import retrofit2.http.Path
 
 /**
  * The Retrofit interface to retrieve data from the backend over http
- *https://raw.githubusercontent.com/tlnacl/reactiveApp/shop/app/server/api/products3.json
+ * https://raw.githubusercontent.com/tlnacl/reactiveApp/shop/app/server/api/products3.json
  * @author Hannes Dorfmann
  */
-public interface ProductBackendApi {
-  @GET("/tlnacl/ReactShopKotlin/master"
-      + "/app/server/api/products{pagination}.json")
-  Observable<List<Product>> getProducts(@Path("pagination") int pagination);
+interface ProductBackendApi {
+    @GET("/tlnacl/ReactShopKotlin/master" + "/app/server/api/products{pagination}.json")
+    fun getProducts(@Path("pagination") pagination: Int): Observable<List<Product>>
 }
