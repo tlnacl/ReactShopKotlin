@@ -18,8 +18,6 @@
 package com.tlnacl.reactiveapp.businesslogic.http
 
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-
-import io.reactivex.Observable
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -30,5 +28,5 @@ import retrofit2.http.Path
  */
 interface ProductBackendApi {
     @GET("/tlnacl/ReactShopKotlin/master" + "/app/server/api/products{pagination}.json")
-    fun getProducts(@Path("pagination") pagination: Int): Observable<List<Product>>
+    suspend fun getProducts(@Path("pagination") pagination: Int): List<Product>
 }

@@ -28,7 +28,7 @@ import javax.inject.Inject
 class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
     @Inject lateinit var presenter: HomePresenter
     @BindView(R.id.swipeRefreshLayout) lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    @BindView(R.id.recyclerView) lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
+    @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
     var spanCount: Int = 2
@@ -72,7 +72,7 @@ class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHold
         presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
         presenter.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
                 .filter { !adapter.isLoadingNextPage() }
-                .filter { it == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_IDLE }
+                .filter { it == RecyclerView.SCROLL_STATE_IDLE }
                 .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
                 .map { HomeUiEvent.LoadNextPage })
         presenter.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })

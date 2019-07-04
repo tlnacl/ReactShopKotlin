@@ -8,7 +8,6 @@ import dagger.Provides
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import javax.inject.Singleton
@@ -41,7 +40,6 @@ class AndroidModule(private val context: Context) {
         val restAdapter = Retrofit.Builder()
                 .baseUrl(BuildConfig.API_ENDPOINT)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//CoroutineCallAdapterFactory()
                 .client(httpClientBuilder.build())
                 .build()
         return restAdapter.create(ProductBackendApi::class.java)
