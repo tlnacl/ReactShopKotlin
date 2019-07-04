@@ -18,8 +18,8 @@
 package com.tlnacl.reactiveapp.businesslogic.http
 
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import io.reactivex.Observable
-import io.reactivex.functions.Function4
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 import javax.inject.Inject
 
@@ -38,36 +38,38 @@ class ProductBackendApiDecorator @Inject
 constructor(private val api: ProductBackendApi) {
 
     /**
-     * Get a list with all products from backend
+     * Get a list with all products from backend, in parallel
      */
-    val allProducts: Observable<List<Product>>
-        get() = Observable.zip(getProducts(0), getProducts(1), getProducts(2), getProducts(3),
-                Function4<List<Product>, List<Product>, List<Product>, List<Product>, List<Product>>
-                { products0, products1, products2, products3 ->
-                    val productList = ArrayList<Product>()
-                    productList.addAll(products0)
-                    productList.addAll(products1)
-                    productList.addAll(products2)
-                    productList.addAll(products3)
-                    productList
-                })
+    suspend fun getAllProducts(): List<Product> = coroutineScope{
+//        (0..3).fold(ArrayList<Product>(), {
+//            acc, i -> suspend {
+//            val product = async { getProducts(i) }
+//            acc.addAll(product.await())
+//            acc
+//        } })
+        val productList = ArrayList<Product>()
+        val p0 = async { getProducts(0) }
+        val p1 = async { getProducts(1) }
+        val p2 = async { getProducts(2) }
+        val p3 = async { getProducts(3) }
+
+        productList.addAll(p0.await())
+        productList.addAll(p1.await())
+        productList.addAll(p2.await())
+        productList.addAll(p3.await())
+        productList
+    }
 
     /**
      * Get a list with all categories
      */
-    val allCategories: Observable<List<String>>
-        get() = allProducts.map { products ->
-            val categories = HashSet<String>()
-            for (p in products) {
-                categories.add(p.category)
-            }
+    suspend fun getAllCategories(): List<String> = coroutineScope {
+        getAllProducts().map { product ->
+            product.category
+        }.toHashSet().toList()
+    }
 
-            val result = ArrayList<String>(categories.size)
-            result.addAll(categories)
-            result
-        }
-
-    fun getProducts(pagination: Int): Observable<List<Product>> {
+    suspend fun getProducts(pagination: Int): List<Product> {
         return api.getProducts(pagination)
     }
 
@@ -76,11 +78,9 @@ constructor(private val api: ProductBackendApi) {
      *
      * @param categoryName The name of the category
      */
-    fun getAllProductsOfCategory(categoryName: String): Observable<List<Product>> {
-        return allProducts.flatMap { Observable.fromIterable(it) }
+    suspend fun getAllProductsOfCategory(categoryName: String): List<Product> {
+        return getAllProducts()
                 .filter { product -> product.category == categoryName }
-                .toList()
-                .toObservable()
     }
 
     /**
@@ -88,9 +88,7 @@ constructor(private val api: ProductBackendApi) {
      *
      * @param productId The product id
      */
-    fun getProduct(productId: Int): Observable<Product> {
-        return allProducts.flatMap { products -> Observable.fromIterable(products) }
-                .filter { product -> product.id == productId }
-                .take(1)
+    suspend fun getProduct(productId: Int): Product? {
+        return getAllProducts().find { it.id == productId }
     }
 }

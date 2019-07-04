@@ -20,6 +20,7 @@ package com.tlnacl.reactiveapp.businesslogic.feed
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import io.reactivex.Observable
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 /**
@@ -32,12 +33,10 @@ constructor(private val backend: ProductBackendApiDecorator) {
     private var endReached = false
     private var newestPageLoaded = false
 
-    fun newestPage(): Observable<List<Product>> {
+    suspend fun newestPage(): List<Product> {
         return if (newestPageLoaded) {
-            Observable.fromCallable {
-                Thread.sleep(1000)
-                emptyList<Product>()
-            }
+            delay(1000)
+            emptyList()
         } else backend.getProducts(0).doOnNext { products -> newestPageLoaded = true }
 
     }
