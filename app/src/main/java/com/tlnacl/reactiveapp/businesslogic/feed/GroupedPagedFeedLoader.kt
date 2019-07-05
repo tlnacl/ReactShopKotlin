@@ -22,7 +22,6 @@ import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
-import io.reactivex.Observable
 import java.util.*
 import javax.inject.Inject
 
@@ -37,39 +36,30 @@ class GroupedPagedFeedLoader @Inject
 constructor(private val feedLoader: PagingFeedLoader) {
     private val collapsedGroupProductItemCount = 3
 
-    val groupedFirstPage: Observable<List<FeedItem>>
-        get() = groupedNextPage
+    suspend fun groupedFirstPage(): List<FeedItem> = groupedNextPage()
 
-    val groupedNextPage: Observable<List<FeedItem>>
-        get() = groupByCategory(feedLoader.nextPage())
+    suspend fun groupedNextPage(): List<FeedItem> = groupByCategory(feedLoader.nextPage())
 
-    val newestPage: Observable<List<FeedItem>>
-        get() = groupByCategory(feedLoader.newestPage())
+    suspend fun newestPage(): List<FeedItem> = groupByCategory(feedLoader.newestPage())
 
-    private fun groupByCategory(
-            originalListToGroup: Observable<List<Product>>): Observable<List<FeedItem>> {
-        return originalListToGroup.flatMap { Observable.fromIterable(it) }
-                .groupBy { it.category }
-                .flatMap { groupedByCategory ->
-                    groupedByCategory.toList().map<List<FeedItem>> { productsInGroup ->
-                        val groupName = groupedByCategory.key
-                        val items = ArrayList<FeedItem>()
-                        items.add(SectionHeader(groupName!!))
-                        if (collapsedGroupProductItemCount < productsInGroup.size) {
-                            for (i in 0 until collapsedGroupProductItemCount) {
-                                items.add(productsInGroup[i])
-                            }
-                            items.add(
-                                    AdditionalItemsLoadable(productsInGroup.size - collapsedGroupProductItemCount,
-                                            groupName, false, null))
-                        } else {
-                            items.addAll(productsInGroup)
+    private suspend fun groupByCategory(originalListToGroup: List<Product>): List<FeedItem> {
+        return originalListToGroup.groupBy { it.category }
+                .map {
+                    val groupName = it.key
+                    val productsInGroup = it.value
+                    val items = ArrayList<FeedItem>()
+                    items.add(SectionHeader(groupName!!))
+                    if (collapsedGroupProductItemCount < productsInGroup.size) {
+                        for (i in 0 until collapsedGroupProductItemCount) {
+                            items.add(productsInGroup[i])
                         }
-                        items
-                    }.toObservable()
-                }
-                .concatMap { Observable.fromIterable(it) }
-                .toList()
-                .toObservable()
+                        items.add(
+                                AdditionalItemsLoadable(productsInGroup.size - collapsedGroupProductItemCount,
+                                        groupName, false, null))
+                    } else {
+                        items.addAll(productsInGroup)
+                    }
+                    items
+                }.flatten()
     }
 }

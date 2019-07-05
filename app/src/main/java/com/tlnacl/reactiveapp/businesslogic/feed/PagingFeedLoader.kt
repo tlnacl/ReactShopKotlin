@@ -19,7 +19,6 @@ package com.tlnacl.reactiveapp.businesslogic.feed
 
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import io.reactivex.Observable
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
@@ -37,23 +36,28 @@ constructor(private val backend: ProductBackendApiDecorator) {
         return if (newestPageLoaded) {
             delay(1000)
             emptyList()
-        } else backend.getProducts(0).doOnNext { products -> newestPageLoaded = true }
+        } else {
+            newestPageLoaded = true
+            backend.getProducts(0)
+        }
 
     }
 
-    fun nextPage(): Observable<List<Product>> {
+    suspend fun nextPage(): List<Product> {
         // I know, it's not a pure function nor elegant code
         // but that is not the purpose of this demo.
         // This code should be understandable by everyone.
 
         return if (endReached) {
-            Observable.just(emptyList())
-        } else backend.getProducts(currentPage).doOnNext { result ->
+            emptyList()
+        } else {
+
+            val products = backend.getProducts(currentPage)
             currentPage++
-            if (result.isEmpty()) {
+            if (products.isEmpty()) {
                 endReached = true
             }
+            products
         }
-
     }
 }

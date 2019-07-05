@@ -20,8 +20,7 @@ package com.tlnacl.reactiveapp.businesslogic.feed
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import io.reactivex.Observable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 /**
@@ -36,22 +35,25 @@ constructor(private val groupedLoader: GroupedPagedFeedLoader,
     /**
      * Typically triggered with a pull-to-refresh
      */
-    fun loadNewestPage(): Observable<List<FeedItem>> {
-        return groupedLoader.newestPage.delay(1, TimeUnit.SECONDS)
+    suspend fun loadNewestPage(): List<FeedItem> {
+        delay(1000)
+        return groupedLoader.newestPage()
     }
 
     /**
      * Loads the first page
      */
-    fun loadFirstPage(): Observable<List<FeedItem>> {
-        return groupedLoader.groupedFirstPage.delay(1, TimeUnit.SECONDS)
+    suspend fun loadFirstPage(): List<FeedItem> {
+        delay(1000)
+        return groupedLoader.groupedFirstPage()
     }
 
     /**
      * loads the next page (pagination)
      */
-    fun loadNextPage(): Observable<List<FeedItem>> {
-        return groupedLoader.groupedNextPage.delay(1, TimeUnit.SECONDS)
+    suspend fun loadNextPage(): List<FeedItem> {
+        delay(1000)
+        return groupedLoader.groupedNextPage()
     }
 
     /**
@@ -59,7 +61,8 @@ constructor(private val groupedLoader: GroupedPagedFeedLoader,
      *
      * @param categoryName the category name
      */
-    fun loadProductsOfCategory(categoryName: String): Observable<List<Product>> {
-        return backendApi.getAllProductsOfCategory(categoryName).delay(1, TimeUnit.SECONDS)
+    suspend fun loadProductsOfCategory(categoryName: String): List<Product> {
+        delay(1000)
+        return backendApi.getAllProductsOfCategory(categoryName)
     }
 }
