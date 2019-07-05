@@ -19,8 +19,7 @@ package com.tlnacl.reactiveapp.businesslogic.searchengine
 
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import io.reactivex.Observable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 /**
@@ -31,20 +30,14 @@ import javax.inject.Inject
 class SearchEngine @Inject
 constructor(private val backend: ProductBackendApiDecorator) {
 
-    fun searchFor(searchQueryText: String): Observable<List<Product>> {
-
-        if (searchQueryText == null) {
-            return Observable.error(NullPointerException("SearchQueryText == null"))
-        }
+    suspend fun searchFor(searchQueryText: String): List<Product> {
 
         return if (searchQueryText.isEmpty()) {
-            Observable.error(IllegalArgumentException("SearchQueryTest is blank"))
-        } else backend.allProducts
-                .delay(1000, TimeUnit.MILLISECONDS)
-                .flatMap { Observable.fromIterable(it) }
-                .filter { product -> isProductMatchingSearchCriteria(product, searchQueryText) }
-                .toList()
-                .toObservable()
+            throw IllegalArgumentException("SearchQueryTest is blank")
+        } else {
+            delay(1000)
+            backend.getAllProducts().filter { isProductMatchingSearchCriteria(it, searchQueryText) }
+        }
 
     }
 

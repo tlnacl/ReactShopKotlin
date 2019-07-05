@@ -1,6 +1,7 @@
 package com.tlnacl.reactiveapp.ui.home
 
 import androidx.core.util.Pair
+import androidx.lifecycle.MutableLiveData
 import com.jakewharton.rxrelay2.PublishRelay
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
@@ -18,8 +19,10 @@ import javax.inject.Inject
  * Created by tomt on 27/06/17.
  */
 class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePresenter<HomeView>() {
-    private var startDisposables = CompositeDisposable()
-    private val changeRelay = PublishRelay.create<StateChange>()
+//    private val changeRelay = PublishRelay.create<StateChange>()
+    val stateLiveData: MutableLiveData<StateChange> by lazy {
+        MutableLiveData<StateChange>()
+    }
 
     init {
         Timber.i("init HomePresenter")
@@ -50,20 +53,18 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
         super.attachView(mvpView)
     }
 
-    fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
-        homeUiEventObservable
-                .doOnNext { Timber.i("homeUiEvent:" + it) }
-                .flatMap { homeUiEvent ->
+    fun handleUiEvent(homeUiEvent: HomeUiEvent) {
+         Timber.i("homeUiEvent:" + homeUiEvent)
                     when (homeUiEvent) {
                         is HomeUiEvent.LoadFirstPage -> loadFirstPage()
                         is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
                         is HomeUiEvent.LoadNextPage -> loadNextPage()
                         is HomeUiEvent.PullToRefresh -> pullToRefresh()
                     }
-                }.subscribe(changeRelay)
     }
 
-    private fun loadFirstPage(): Observable<StateChange> {
+    private fun loadFirstPage(): StateChange {
+        Timber.d("loadFirstPage")
         return feedLoader.loadFirstPage()
                 .doOnNext { Timber.d("loadFirstPage") }
                 .map<StateChange> { StateChange.FirstPageLoaded(it) }
