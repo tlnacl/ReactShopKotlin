@@ -9,7 +9,7 @@ import kotlin.coroutines.CoroutineContext
  * Created by tomt on 23/06/17.
  */
 abstract class BasePresenter<T : MvpView> : CoroutineScope {
-    private lateinit var job: Job
+    private val job = Job()
 
     override val coroutineContext: CoroutineContext
         get() = job + Dispatchers.Main
