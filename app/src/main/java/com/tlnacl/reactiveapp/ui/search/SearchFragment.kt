@@ -2,14 +2,11 @@ package com.tlnacl.reactiveapp.ui.search
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.transition.TransitionManager
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.transition.TransitionManager
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.jakewharton.rxbinding2.widget.RxSearchView
@@ -19,6 +16,10 @@ import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -33,13 +34,16 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
         activity!!.startActivity(i)
     }
 
+    private val binderJob = Job()
+    private val scope = CoroutineScope(Dispatchers.Main + binderJob)
+
     @BindView(R.id.searchView) lateinit var searchView: android.widget.SearchView
     @BindView(R.id.container) lateinit var container: ViewGroup
     @BindView(R.id.loadingView) lateinit var loadingView: View
     @BindView(R.id.errorView) lateinit var errorView: TextView
     @BindView(R.id.recyclerView) lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
     @BindView(R.id.emptyView) lateinit var emptyView: View
-    var spanCount: Int = 2
+    private var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
 
@@ -48,6 +52,11 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity!!.application as AndroidApplication).appComponent.inject(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binderJob.cancel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,12 +77,14 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
-        presenter.handleUiEvent(RxSearchView.queryTextChanges(searchView)
-                .skip(2) // Because after screen orientation changes query Text will be resubmitted again
-                .filter { queryString -> queryString.length > 3 || queryString.isEmpty() }
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .distinctUntilChanged()
-                .map { it.toString() })
+        scope.launch {
+            presenter.onUiEvent(RxSearchView.queryTextChanges(searchView)
+                    .skip(2) // Because after screen orientation changes query Text will be resubmitted again
+                    .filter { queryString -> queryString.length > 3 || queryString.isEmpty() }
+                    .debounce(500, TimeUnit.MILLISECONDS)
+                    .distinctUntilChanged()
+                    .map { it.toString() })
+        }
 
     }
 
