@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -19,13 +20,21 @@ import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import io.reactivex.Observable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
+class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
+    // TODO do we need it in ui
+    private val binderJob = Job()
+    private val scope = CoroutineScope(Dispatchers.Main + binderJob)
+
     @Inject lateinit var presenter: HomePresenter
     @BindView(R.id.swipeRefreshLayout) lateinit var swipeRefreshLayout: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
     @BindView(R.id.recyclerView) lateinit var recyclerView: RecyclerView
@@ -68,14 +77,16 @@ class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHold
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
-        presenter.handleUiEvent(Observable.just(HomeUiEvent.LoadFirstPage))
-        presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
-        presenter.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
-                .filter { !adapter.isLoadingNextPage() }
-                .filter { it == RecyclerView.SCROLL_STATE_IDLE }
-                .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
-                .map { HomeUiEvent.LoadNextPage })
-        presenter.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })
+        scope.launch {
+            presenter.handleUiEvent(Observable.just(HomeUiEvent.LoadFirstPage))
+            presenter.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
+            presenter.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
+                    .filter { !adapter.isLoadingNextPage() }
+                    .filter { it == RecyclerView.SCROLL_STATE_IDLE }
+                    .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
+                    .map { HomeUiEvent.LoadNextPage })
+            presenter.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })
+        }
     }
 
     override fun onProductClicked(product: Product) {
@@ -142,6 +153,15 @@ class HomeFragment : androidx.fragment.app.Fragment(), HomeView, ProductViewHold
         loadingView.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
         errorView.visibility = View.VISIBLE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binderJob.cancel()
+
+//        if (!isChangingConfigurations) {
+//            presentation.stop()
+//        }
     }
 
 }

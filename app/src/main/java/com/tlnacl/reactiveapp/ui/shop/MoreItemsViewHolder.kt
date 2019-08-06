@@ -1,18 +1,18 @@
 package com.tlnacl.reactiveapp.ui.shop
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 
 class MoreItemsViewHolder (context: Context, private val callback: LoadItemsClickListener)
-    : androidx.recyclerview.widget.RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false)) {
+    : RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false)) {
 
     interface LoadItemsClickListener {
         fun loadItemsForCategory(category: String)

@@ -1,17 +1,17 @@
 package com.tlnacl.reactiveapp.ui.home
 
 import androidx.core.util.Pair
-import androidx.lifecycle.MutableLiveData
-import com.jakewharton.rxrelay2.PublishRelay
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
 import com.tlnacl.reactiveapp.ui.BasePresenter
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.RENDEZVOUS
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.collect
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,85 +19,128 @@ import javax.inject.Inject
  * Created by tomt on 27/06/17.
  */
 class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePresenter<HomeView>() {
-//    private val changeRelay = PublishRelay.create<StateChange>()
-    val stateLiveData: MutableLiveData<StateChange> by lazy {
-        MutableLiveData<StateChange>()
-    }
+    //    private val changeRelay = PublishRelay.create<StateChange>()
+    private val changeChannel = Channel<StateChange>()
+
+    private val _events = Channel<HomeUiEvent>(RENDEZVOUS)
+    public val events: SendChannel<HomeUiEvent> get() = _events
+//    val stateLiveData: MutableLiveData<StateChange> by lazy {
+//        MutableLiveData<StateChange>()
+//    }
 
     init {
         Timber.i("init HomePresenter")
-        startDisposables.add(changeRelay
-                .scan(HomeViewState(loadingFirstPage = true), { homeViewState, stateChange ->
-                    when (stateChange) {
-                        is StateChange.FirstPageLoading -> HomeViewState(loadingFirstPage = true)
-                        is StateChange.FirstPageLoaded -> HomeViewState(data = stateChange.data)
-                        is StateChange.FirstPageError -> HomeViewState(firstPageError = stateChange.error)
-                        is StateChange.ProductsOfCategoryLoading -> handleProductsOfCategoryLoading(homeViewState, stateChange)
-                        is StateChange.ProductsOfCategoryLoaded -> handleProductsOfCategoryLoaded(homeViewState, stateChange)
-                        is StateChange.ProductsOfCategoryError -> handleProductsOfCategoryError(homeViewState, stateChange)
-                        is StateChange.NextPageLoading -> homeViewState.copy(loadingNextPage = true, nextPageError = null)
-                        is StateChange.NextPageLoaded -> handleNextPageLoaded(homeViewState, stateChange)
-                        is StateChange.NextPageError -> homeViewState.copy(loadingNextPage = false, nextPageError = stateChange.error)
-                        is StateChange.PullToRefreshLoading -> homeViewState.copy(loadingPullToRefresh = true, pullToRefreshError = null)
-                        is StateChange.PullToRefreshLoaded -> handlePullToRefreshLoaded(homeViewState, stateChange)
-                        is StateChange.PullToRefreshError -> homeViewState.copy(loadingPullToRefresh = false, pullToRefreshError = stateChange.error)
-                    }
-                })
-                .distinctUntilChanged()
-                .doOnNext { Timber.d("changeRelay:" + it) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { mvpView?.render(it) })
+        launch { processStateChange() }
+    }
+
+    private suspend fun processStateChange() {
+        // TODO currentState as var is not feeling good
+        var currentState = HomeViewState(loadingFirstPage = true)
+        for (stateChange in changeChannel) {
+            val homeViewState = when (stateChange) {
+                is StateChange.FirstPageLoading -> HomeViewState(loadingFirstPage = true)
+                is StateChange.FirstPageLoaded -> HomeViewState(data = stateChange.data)
+                is StateChange.FirstPageError -> HomeViewState(firstPageError = stateChange.error)
+                is StateChange.ProductsOfCategoryLoading -> handleProductsOfCategoryLoading(currentState, stateChange)
+                is StateChange.ProductsOfCategoryLoaded -> handleProductsOfCategoryLoaded(currentState, stateChange)
+                is StateChange.ProductsOfCategoryError -> handleProductsOfCategoryError(currentState, stateChange)
+                is StateChange.NextPageLoading -> currentState.copy(loadingNextPage = true, nextPageError = null)
+                is StateChange.NextPageLoaded -> handleNextPageLoaded(currentState, stateChange)
+                is StateChange.NextPageError -> currentState.copy(loadingNextPage = false, nextPageError = stateChange.error)
+                is StateChange.PullToRefreshLoading -> currentState.copy(loadingPullToRefresh = true, pullToRefreshError = null)
+                is StateChange.PullToRefreshLoaded -> handlePullToRefreshLoaded(currentState, stateChange)
+                is StateChange.PullToRefreshError -> currentState.copy(loadingPullToRefresh = false, pullToRefreshError = stateChange.error)
+            }
+            if (currentState != homeViewState) {
+                currentState = homeViewState
+                Timber.d("render:$currentState")
+                mvpView?.render(currentState)
+            }
+        }
     }
 
     override fun attachView(mvpView: HomeView) {
         super.attachView(mvpView)
     }
 
-    fun handleUiEvent(homeUiEvent: HomeUiEvent) {
-         Timber.i("homeUiEvent:" + homeUiEvent)
-                    when (homeUiEvent) {
-                        is HomeUiEvent.LoadFirstPage -> loadFirstPage()
-                        is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
-                        is HomeUiEvent.LoadNextPage -> loadNextPage()
-                        is HomeUiEvent.PullToRefresh -> pullToRefresh()
-                    }
+    // TODO duplicate with handleUiEvent
+    fun onUiEvent(event: HomeUiEvent) {
+        launch {
+            Timber.i("homeUiEvent:$event")
+            when (event) {
+                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+                is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(event.categoryName)
+                is HomeUiEvent.LoadNextPage -> loadNextPage()
+                is HomeUiEvent.PullToRefresh -> pullToRefresh()
+                else -> pullToRefresh()
+            }
+        }
     }
 
-    private fun loadFirstPage(): StateChange {
+//    fun CoroutineScope.onUiEvents(events: ReceiveChannel<HomeUiEvent>) =
+//            launch {
+//                events.consumeEach { event ->
+//                    Timber.i("homeUiEvent:$event")
+//                    when (event) {
+//                        is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+//                        is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(event.categoryName)
+//                        is HomeUiEvent.LoadNextPage -> loadNextPage()
+//                        is HomeUiEvent.PullToRefresh -> pullToRefresh()
+//                        else -> pullToRefresh()
+//                    }
+//                }
+//            }
+
+    suspend fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
+        homeUiEventObservable.collect { homeUiEvent ->
+            Timber.i("homeUiEvent:$homeUiEvent")
+            when (homeUiEvent) {
+                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+                is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
+                is HomeUiEvent.LoadNextPage -> loadNextPage()
+                is HomeUiEvent.PullToRefresh -> pullToRefresh()
+                else -> pullToRefresh()
+            }
+        }
+    }
+
+    private suspend fun loadFirstPage() {
         Timber.d("loadFirstPage")
-        return feedLoader.loadFirstPage()
-                .doOnNext { Timber.d("loadFirstPage") }
-                .map<StateChange> { StateChange.FirstPageLoaded(it) }
-                .onErrorReturn { StateChange.FirstPageError(it) }
-                .subscribeOn(Schedulers.io())
-                .startWith(StateChange.FirstPageLoading)
+        try {
+            changeChannel.send(StateChange.FirstPageLoading)
+            changeChannel.send(StateChange.FirstPageLoaded(feedLoader.loadFirstPage()))
+        } catch (e: Exception) {
+            changeChannel.send(StateChange.FirstPageError(e))
+        }
     }
 
-    private fun loadAllProductsFromCategory(categoryName: String): Observable<StateChange> {
-        return feedLoader.loadProductsOfCategory(categoryName)
-                .doOnNext { Timber.d("loadAllProductsFromCategory") }
-                .map<StateChange> { StateChange.ProductsOfCategoryLoaded(categoryName, it) }
-                .onErrorReturn { StateChange.ProductsOfCategoryError(categoryName, it) }
-                .subscribeOn(Schedulers.io())
-                .startWith(StateChange.ProductsOfCategoryLoading(categoryName))
+    private suspend fun loadAllProductsFromCategory(categoryName: String) {
+        Timber.d("loadAllProductsFromCategory")
+        try {
+            changeChannel.send(StateChange.ProductsOfCategoryLoading(categoryName))
+            val productsOfCategory = feedLoader.loadProductsOfCategory(categoryName)
+            changeChannel.send(StateChange.ProductsOfCategoryLoaded(categoryName, productsOfCategory))
+        } catch (e: Exception) {
+            changeChannel.send(StateChange.ProductsOfCategoryError(categoryName, e))
+        }
     }
 
-    private fun loadNextPage(): Observable<StateChange> {
-        return feedLoader.loadNextPage()
-                .doOnNext { Timber.d("loadNextPage") }
-                .map<StateChange> { StateChange.NextPageLoaded(it) }
-                .onErrorReturn { StateChange.NextPageError(it) }
-                .subscribeOn(Schedulers.io())
-                .startWith(StateChange.NextPageLoading)
+    private suspend fun loadNextPage() {
+        try {
+            changeChannel.send(StateChange.NextPageLoading)
+            changeChannel.send(StateChange.NextPageLoaded(feedLoader.loadNextPage()))
+        } catch (e: Exception) {
+            changeChannel.send(StateChange.NextPageError(e))
+        }
     }
 
-    private fun pullToRefresh(): Observable<StateChange> {
-        return feedLoader.loadNewestPage()
-                .doOnNext { Timber.d("pullToRefresh") }
-                .map<StateChange> { StateChange.PullToRefreshLoaded(it) }
-                .onErrorReturn { StateChange.PullToRefreshError(it) }
-                .subscribeOn(Schedulers.io())
-                .startWith(StateChange.PullToRefreshLoading)
+    private suspend fun pullToRefresh() {
+        try {
+            changeChannel.send(StateChange.PullToRefreshLoading)
+            changeChannel.send(StateChange.NextPageLoaded(feedLoader.loadNewestPage()))
+        } catch (e: Exception) {
+            changeChannel.send(StateChange.PullToRefreshError(e))
+        }
     }
 
     private fun handleNextPageLoaded(homeViewState: HomeViewState, stateChange: StateChange.NextPageLoaded): HomeViewState {
@@ -138,7 +181,7 @@ class HomePresenter @Inject constructor(val feedLoader: HomeFeedLoader) : BasePr
         for (i in found.first!! downTo 0) {
             val item = homeViewState.data[i]
             if (item is SectionHeader && item.name
-                    .equals(stateChange.categoryName)) {
+                            .equals(stateChange.categoryName)) {
                 sectionHeaderIndex = i
                 break
             }

@@ -1,13 +1,9 @@
 package com.tlnacl.reactiveapp.ui.search
 
-import com.jakewharton.rxrelay2.PublishRelay
 import com.tlnacl.reactiveapp.businesslogic.searchengine.SearchEngine
 import com.tlnacl.reactiveapp.ui.BasePresenter
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
+import kotlinx.coroutines.rx2.collect
 import javax.inject.Inject
 
 /**
@@ -15,9 +11,6 @@ import javax.inject.Inject
  */
 class SearchPrensenter
 @Inject constructor(val searchEngine: SearchEngine) : BasePresenter<SearchView>() {
-    private var startDisposables = CompositeDisposable()
-    private val changeRequestRelay = PublishRelay.create<String>()
-    //TODO init state is in all presenter due to presenter is for ui move to BasePresenter
     fun initState() {
         mvpView?.render(SearchViewState.SearchNotStartedYet)
 //        startDisposables.add(changeRequestRelay
@@ -25,24 +18,21 @@ class SearchPrensenter
 //                .subscribe(this::search))
     }
 
-    //query can be wrap by SearchEvent if it gets complecated
-    //TODO handle ui event is in all presenter move to BasePresenter
-    fun handleUiEvent(query: Observable<String>) {
-        //interesting result of SearchNotStartedYet if using flatMap instead of switchMap
-        startDisposables.add(query.switchMap { searchString ->
-            if (searchString.isEmpty()) Observable.just(SearchViewState.SearchNotStartedYet)
-            else searchEngine.searchFor(searchString)
-                    .map<SearchViewState> { products ->
-                        if (products.isEmpty()) SearchViewState.EmptyResult
-                        else SearchViewState.SearchResult(products)
-                    }
-                    .doOnNext { Timber.d(it.toString()) }
-                    .onErrorReturn { error -> SearchViewState.Error(error) }
-                    .subscribeOn(Schedulers.io())
-                    .startWith(SearchViewState.Loading)
+    suspend fun onUiEvent(query: Observable<String>) {
+        query.collect {
+            // TODO debounce
+            if (it.isEmpty()) mvpView?.render(SearchViewState.SearchNotStartedYet)
+            else {
+                try {
+                    mvpView?.render(SearchViewState.Loading)
+                    val products = searchEngine.searchFor(it)
+                    if (products.isEmpty()) mvpView?.render(SearchViewState.EmptyResult)
+                    else mvpView?.render(SearchViewState.SearchResult(products))
+                } catch (e: Exception) {
+                    mvpView?.render(SearchViewState.Error(e))
+                }
 
+            }
         }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { mvpView?.render(it) })
     }
 }
