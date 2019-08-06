@@ -1,9 +1,18 @@
 package com.tlnacl.reactiveapp.ui
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlin.coroutines.CoroutineContext
+
 /**
  * Created by tomt on 23/06/17.
  */
-abstract class BasePresenter<T : MvpView> {
+abstract class BasePresenter<T : MvpView> : CoroutineScope {
+    private lateinit var job: Job
+
+    override val coroutineContext: CoroutineContext
+        get() = job + Dispatchers.Main
 
     var mvpView: T? = null
 
@@ -12,6 +21,7 @@ abstract class BasePresenter<T : MvpView> {
     }
 
     fun detachView() {
+        job.cancel()
         mvpView = null
     }
 
