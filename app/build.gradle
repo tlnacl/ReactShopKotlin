@@ -34,6 +34,7 @@ dependencies {
     def butterKnifeVersion = '10.1.0'
     def daggerVersion = '2.23'
     def rxBindingVersion = '2.0.0'
+    def lifecycleVersion = '2.2.0-alpha02'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
@@ -50,7 +51,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.2.1"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha02"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
 
 
     implementation "com.jakewharton:butterknife:$butterKnifeVersion"
@@ -71,7 +72,7 @@ dependencies {
     implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxBindingVersion"
 
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
     implementation 'com.sothree.slidinguppanel:library:3.3.1'
