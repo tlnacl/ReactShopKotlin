@@ -7,4 +7,6 @@ Working on using Android architecture component to handle orientation change
 
 change Rxjava to Coroutines
 
+In this branch, using kotlinx-coroutines-rx2 to partly convert rxjava to coroutines. It help with migrate rxjava2 to coroutines.
+
 change mvp to use Android architecture component view model
