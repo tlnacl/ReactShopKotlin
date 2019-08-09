@@ -1,6 +1,9 @@
 package com.tlnacl.reactiveapp
 
 import android.app.Application
+import com.tlnacl.reactiveapp.di.AndroidModule
+import com.tlnacl.reactiveapp.di.AppComponent
+import com.tlnacl.reactiveapp.di.DaggerAppComponent
 import timber.log.Timber
 
 /**

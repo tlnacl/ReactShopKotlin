@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp
+package com.tlnacl.reactiveapp.di
 
 import com.tlnacl.reactiveapp.di.viewmodel.ViewModelModule
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity

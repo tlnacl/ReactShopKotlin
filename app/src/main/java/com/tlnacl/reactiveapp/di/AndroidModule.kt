@@ -1,7 +1,8 @@
-package com.tlnacl.reactiveapp
+package com.tlnacl.reactiveapp.di
 
 import android.content.Context
 import com.facebook.stetho.okhttp3.StethoInterceptor
+import com.tlnacl.reactiveapp.BuildConfig
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApi
 import dagger.Module
 import dagger.Provides
@@ -32,7 +33,7 @@ class AndroidModule(private val context: Context) {
                     Timber.tag("OkHttp").d(message)
                 }
             })
-            loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+            loggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
             httpClientBuilder.addInterceptor(loggingInterceptor)
             httpClientBuilder.addNetworkInterceptor(StethoInterceptor())
         }
