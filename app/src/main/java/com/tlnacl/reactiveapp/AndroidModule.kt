@@ -16,15 +16,19 @@ import javax.inject.Singleton
 @Module
 class AndroidModule(private val context: Context) {
 
-    @Singleton @Provides fun provideContext(): Context = context
+    @Singleton
+    @Provides
+    fun provideContext(): Context = context
 
-    @Singleton @Provides fun provideProductBackendService(): ProductBackendApi {
+    @Singleton
+    @Provides
+    fun provideProductBackendService(): ProductBackendApi {
         val httpClientBuilder = OkHttpClient.Builder()
 
         if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor { message -> Timber.d(message) }
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-      httpClientBuilder.addInterceptor(loggingInterceptor)
+            httpClientBuilder.addInterceptor(loggingInterceptor)
             httpClientBuilder.addNetworkInterceptor(StethoInterceptor())
         }
 
