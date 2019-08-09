@@ -1,5 +1,6 @@
 package com.tlnacl.reactiveapp
 
+import com.tlnacl.reactiveapp.di.viewmodel.ViewModelModule
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.home.HomeFragment
 import com.tlnacl.reactiveapp.ui.search.SearchFragment
@@ -8,7 +9,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Component(
-  modules = [AndroidModule::class]
+  modules = [AndroidModule::class, ViewModelModule::class]
 )
 @Singleton
 interface AppComponent {
