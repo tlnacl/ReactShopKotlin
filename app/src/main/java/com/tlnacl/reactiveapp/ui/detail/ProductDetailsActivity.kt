@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.transition.TransitionManager
 import butterknife.BindView
@@ -31,17 +33,29 @@ class ProductDetailsActivity : AppCompatActivity() {
     private var product: Product? = null
     private var isProductInshoppingCart = false
 
-    @BindView(R.id.errorView) lateinit var errorView: View
-    @BindView(R.id.loadingView) lateinit var loadingView: View
-    @BindView(R.id.detailsView) lateinit var detailsView: View
-    @BindView(R.id.price) lateinit var price: TextView
-    @BindView(R.id.description) lateinit var description: TextView
-    @BindView(R.id.fab) lateinit var fab: FloatingActionButton
-    @BindView(R.id.backdrop) lateinit var backdrop: ImageView
-    @BindView(R.id.toolbar) lateinit var toolbar: Toolbar
-    @BindView(R.id.root) lateinit var rootView: ViewGroup
-    @BindView(R.id.collapsingToolbar) lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    @BindView(R.id.errorView)
+    lateinit var errorView: View
+    @BindView(R.id.loadingView)
+    lateinit var loadingView: View
+    @BindView(R.id.detailsView)
+    lateinit var detailsView: View
+    @BindView(R.id.price)
+    lateinit var price: TextView
+    @BindView(R.id.description)
+    lateinit var description: TextView
+    @BindView(R.id.fab)
+    lateinit var fab: FloatingActionButton
+    @BindView(R.id.backdrop)
+    lateinit var backdrop: ImageView
+    @BindView(R.id.toolbar)
+    lateinit var toolbar: Toolbar
+    @BindView(R.id.root)
+    lateinit var rootView: ViewGroup
+    @BindView(R.id.collapsingToolbar)
+    lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,18 +66,18 @@ class ProductDetailsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Timber.d("onCreate")
-        val viewModel = ViewModelProviders.of(this).get(ProductDetailsViewModel::class.java)
-        viewModel.productDetailsLD.observe(this, androidx.lifecycle.Observer {
+        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
+        viewModel.getProductDetails().observe(this, Observer {
             render(it)
         })
 
-        viewModel.doAction(intent.getIntExtra(KEY_PRODUCT_ID,0))
+        viewModel.doAction(intent.getIntExtra(KEY_PRODUCT_ID, 0))
     }
 
-    override fun render(productDetailsViewState: ProductDetailsViewState) {
+    private fun render(productDetailsViewState: ProductDetailsViewState) {
         Timber.d("render $productDetailsViewState")
 
-        when(productDetailsViewState){
+        when (productDetailsViewState) {
             is ProductDetailsViewState.Loading -> renderLoading()
             is ProductDetailsViewState.Data -> renderData(productDetailsViewState)
             is ProductDetailsViewState.Error -> renderError()
