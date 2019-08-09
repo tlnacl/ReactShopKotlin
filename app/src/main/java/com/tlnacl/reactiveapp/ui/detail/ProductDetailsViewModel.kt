@@ -8,9 +8,6 @@ import com.tlnacl.reactiveapp.ui.BaseViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/**
- *
- */
 class ProductDetailsViewModel @Inject constructor(private val api: ProductBackendApiDecorator): BaseViewModel() {
     private val productDetailsLD = MutableLiveData<ProductDetailsViewState>()
 

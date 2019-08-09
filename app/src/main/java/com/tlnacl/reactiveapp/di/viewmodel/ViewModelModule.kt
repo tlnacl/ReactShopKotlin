@@ -3,6 +3,7 @@ package com.tlnacl.reactiveapp.di.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsViewModel
+import com.tlnacl.reactiveapp.ui.home.HomeViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -15,5 +16,10 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ProductDetailsViewModel::class)
-    abstract fun bindsMoviesViewModel(moviesViewModel: ProductDetailsViewModel): ViewModel
+    abstract fun bindsProductDetailsViewModel(viewModel: ProductDetailsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HomeViewModel::class)
+    abstract fun bindsHomeViewModel(viewModel: HomeViewModel): ViewModel
 }
