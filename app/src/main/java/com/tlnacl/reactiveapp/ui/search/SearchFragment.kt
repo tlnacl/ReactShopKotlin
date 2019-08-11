@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.transition.TransitionManager
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
@@ -16,6 +13,8 @@ import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
+import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.include_errorview.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -36,13 +35,6 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
 
     private val binderJob = Job()
     private val scope = CoroutineScope(Dispatchers.Main + binderJob)
-
-    @BindView(R.id.searchView) lateinit var searchView: android.widget.SearchView
-    @BindView(R.id.container) lateinit var container: ViewGroup
-    @BindView(R.id.loadingView) lateinit var loadingView: View
-    @BindView(R.id.errorView) lateinit var errorView: TextView
-    @BindView(R.id.recyclerView) lateinit var recyclerView: androidx.recyclerview.widget.RecyclerView
-    @BindView(R.id.emptyView) lateinit var emptyView: View
     private var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
@@ -61,7 +53,6 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
-        ButterKnife.bind(this, view!!)
         //? how about init state at attachview ??
         presenter.attachView(this)
         presenter.initState()

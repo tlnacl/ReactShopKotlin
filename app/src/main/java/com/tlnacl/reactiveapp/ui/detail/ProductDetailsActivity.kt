@@ -2,25 +2,18 @@ package com.tlnacl.reactiveapp.ui.detail
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.transition.TransitionManager
-import butterknife.BindView
-import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import kotlinx.android.synthetic.main.activity_product_detail.*
+import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -36,37 +29,14 @@ class ProductDetailsActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    @BindView(R.id.errorView)
-    lateinit var errorView: View
-    @BindView(R.id.loadingView)
-    lateinit var loadingView: View
-    @BindView(R.id.detailsView)
-    lateinit var detailsView: View
-    @BindView(R.id.price)
-    lateinit var price: TextView
-    @BindView(R.id.description)
-    lateinit var description: TextView
-    @BindView(R.id.fab)
-    lateinit var fab: FloatingActionButton
-    @BindView(R.id.backdrop)
-    lateinit var backdrop: ImageView
-    @BindView(R.id.toolbar)
-    lateinit var toolbar: Toolbar
-    @BindView(R.id.root)
-    lateinit var rootView: ViewGroup
-    @BindView(R.id.collapsingToolbar)
-    lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_detail)
-        ButterKnife.bind(this)
         (application as AndroidApplication).appComponent.inject(this)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Timber.d("onCreate")
-        val viewModel = ViewModelProviders.of(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
+        val viewModel = ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
         viewModel.getProductDetails().observe(this, Observer {
             render(it)
         })
@@ -102,7 +72,7 @@ class ProductDetailsActivity : AppCompatActivity() {
         price.text = "Price: $" + String.format(Locale.US, "%.2f", product?.price)
         description.text = product?.getDescription()
         toolbar.title = product?.getName()
-        collapsingToolbarLayout.title = product?.name
+        collapsingToolbar.title = product?.name
 
         if (isProductInshoppingCart) {
             fab.setImageResource(R.drawable.ic_in_shopping_cart)

@@ -1,26 +1,15 @@
 package com.tlnacl.reactiveapp.ui.shop
 
-import android.content.Context
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
-import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_section_header.*
 
 /**
  * @author Hannes Dorfmann
  */
-class SectionHederViewHolder(context: Context, parent: ViewGroup)
-    : androidx.recyclerview.widget.RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_section_header, parent, false)) {
-
-    @BindView(R.id.sectionName) lateinit var sectionName: TextView
-
-    init {
-        ButterKnife.bind(this, itemView)
-    }
+class SectionHederViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun onBind(item: SectionHeader) {
         sectionName.text = item.name

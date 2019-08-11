@@ -1,37 +1,26 @@
 package com.tlnacl.reactiveapp.ui.shop
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.tlnacl.reactiveapp.Constants
-import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_product.*
 
 /**
  * Created by tomt on 23/06/17.
  */
-class ProductViewHolder(context: Context, parent: ViewGroup, val callback: ProductClickedListener)
-    : androidx.recyclerview.widget.RecyclerView.ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_product, parent, false)) {
-
-    @BindView(R.id.productImage) lateinit var image: ImageView
-    @BindView(R.id.productName) lateinit var name: TextView
-
-    init {
-        ButterKnife.bind(this, itemView)
-    }
+class ProductViewHolder(override val containerView: View, private val callback: ProductClickedListener)
+    : RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     fun bind(product: Product){
         Glide.with(itemView.context)
                 .load(Constants.BASE_IMAGE_URL + product.image)
                 .apply(RequestOptions.centerCropTransform())
-                .into(image)
-        name.setText(product.name)
+                .into(productImage)
+        productName.text = product.name
         itemView.setOnClickListener { callback.onProductClicked(product) }
     }
 
