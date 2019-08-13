@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.transition.TransitionManager
-import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
@@ -33,8 +32,6 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
         activity!!.startActivity(i)
     }
 
-    private val binderJob = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + binderJob)
     private var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
@@ -44,11 +41,6 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity!!.application as AndroidApplication).appComponent.inject(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binderJob.cancel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,15 +60,15 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
-        scope.launch {
+        searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener{
+
+        })
             presenter.onUiEvent(RxSearchView.queryTextChanges(searchView)
                     .skip(2) // Because after screen orientation changes query Text will be resubmitted again
                     .filter { queryString -> queryString.length > 3 || queryString.isEmpty() }
                     .debounce(500, TimeUnit.MILLISECONDS)
                     .distinctUntilChanged()
                     .map { it.toString() })
-        }
-
     }
 
     override fun render(searchViewState: SearchViewState) {

@@ -10,15 +10,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout
-import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
+import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
-import io.reactivex.Observable
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -27,8 +25,10 @@ import javax.inject.Inject
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener {
-    @Inject lateinit var viewModelFactory: ViewModelProvider.Factory
+class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    lateinit var viewModel: HomeViewModel
     var spanCount: Int = 2
 
     private lateinit var adapter: HomeAdapter
@@ -58,29 +58,34 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
                 return 1
             }
         }
-        adapter = HomeAdapter(activity!!, this)
+        adapter = HomeAdapter(activity!!, this, this)
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
         viewModel.getHomeLiveData().observe(this, Observer { render(it) })
 
-        viewModel.handleUiEvent(Observable.just(HomeUiEvent.LoadFirstPage))
-        viewModel.handleUiEvent(adapter.loadMoreItemsOfCategoryObservable().map { HomeUiEvent.LoadAllProductsFromCategory(it) })
-        viewModel.handleUiEvent(RxRecyclerView.scrollStateChanges(recyclerView)
-                    .filter { !adapter.isLoadingNextPage() }
-                    .filter { it == RecyclerView.SCROLL_STATE_IDLE }
-                    .filter { layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1 }
-                    .map { HomeUiEvent.LoadNextPage })
-        viewModel.handleUiEvent(RxSwipeRefreshLayout.refreshes(swipeRefreshLayout).map { HomeUiEvent.PullToRefresh })
+        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!adapter.isLoadingNextPage() && newState == RecyclerView.SCROLL_STATE_IDLE && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1)
+                    viewModel.onUiEvent(HomeUiEvent.LoadNextPage)
+            }
+        })
+        swipeRefreshLayout.setOnRefreshListener { viewModel.onUiEvent(HomeUiEvent.PullToRefresh) }
     }
 
     override fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
         activity!!.startActivity(i)
+    }
+
+    override fun loadItemsForCategory(category: String) {
+        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
     }
 
     override fun render(homeViewState: HomeViewState) {

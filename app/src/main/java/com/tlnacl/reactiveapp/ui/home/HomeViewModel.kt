@@ -54,14 +54,20 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
     fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
         uiScope.launch {
             homeUiEventObservable.collect { homeUiEvent ->
-                Timber.i("homeUiEvent:$homeUiEvent")
-                when (homeUiEvent) {
-                    is HomeUiEvent.LoadFirstPage -> loadFirstPage()
-                    is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
-                    is HomeUiEvent.LoadNextPage -> loadNextPage()
-                    is HomeUiEvent.PullToRefresh -> pullToRefresh()
-                    else -> pullToRefresh()
-                }
+                onUiEvent(homeUiEvent)
+            }
+        }
+    }
+
+    fun onUiEvent(uiEvent: HomeUiEvent) {
+        Timber.i("homeUiEvent:$uiEvent")
+        uiScope.launch {
+            when (uiEvent) {
+                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+                is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(uiEvent.categoryName)
+                is HomeUiEvent.LoadNextPage -> loadNextPage()
+                is HomeUiEvent.PullToRefresh -> pullToRefresh()
+                else -> pullToRefresh()
             }
         }
     }

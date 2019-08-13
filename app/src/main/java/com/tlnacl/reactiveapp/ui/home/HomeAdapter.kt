@@ -14,14 +14,13 @@ import com.tlnacl.reactiveapp.ui.shop.LoadingViewHolder
 import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.shop.SectionHederViewHolder
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener) :
-        RecyclerView.Adapter<RecyclerView.ViewHolder>(), MoreItemsViewHolder.LoadItemsClickListener {
+class HomeAdapter(private val context: Context, private val productCallback: ProductViewHolder.ProductClickedListener,
+                  private val moreItemsCallback: MoreItemsViewHolder.LoadItemsClickListener) :
+        RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         val VIEW_TYPE_PRODUCT = 0
@@ -29,8 +28,6 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
         val VIEW_TYPE_SECTION_HEADER = 2
         val VIEW_TYPE_MORE_ITEMS_AVAILABLE = 3
     }
-
-    private val loadMoreItemsOfCategoryObservable = PublishSubject.create<String>()
 
     private var items: List<FeedItem> = emptyList()
 
@@ -42,9 +39,9 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
-            VIEW_TYPE_PRODUCT -> return ProductViewHolder(LayoutInflater.from(context).inflate(R.layout.item_product, parent, false), callback)
+            VIEW_TYPE_PRODUCT -> return ProductViewHolder(LayoutInflater.from(context).inflate(R.layout.item_product, parent, false), productCallback)
             VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder(context, parent)
-            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false), this)
+            VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false), moreItemsCallback)
             VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder(LayoutInflater.from(context).inflate(R.layout.item_section_header, parent, false))
         }
 
@@ -63,14 +60,6 @@ class HomeAdapter(private val context: Context, private val callback: ProductVie
             is MoreItemsViewHolder -> holder.bind(item as AdditionalItemsLoadable)
             else -> throw IllegalArgumentException("couldn't accept  ViewHolder " + holder)
         }
-    }
-
-    override fun loadItemsForCategory(category: String) {
-        loadMoreItemsOfCategoryObservable.onNext(category)
-    }
-
-    fun loadMoreItemsOfCategoryObservable(): Observable<String> {
-        return loadMoreItemsOfCategoryObservable
     }
 
     private var isLoadingNextPage: Boolean = false
