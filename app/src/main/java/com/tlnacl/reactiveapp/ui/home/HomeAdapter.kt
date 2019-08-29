@@ -39,7 +39,7 @@ class HomeAdapter(private val context: Context, private val productCallback: Pro
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
-            VIEW_TYPE_PRODUCT -> return ProductViewHolder(LayoutInflater.from(context).inflate(R.layout.item_product, parent, false), productCallback)
+            VIEW_TYPE_PRODUCT -> return ProductViewHolder(context, parent, productCallback)
             VIEW_TYPE_LOADING_MORE_NEXT_PAGE -> return LoadingViewHolder(context, parent)
             VIEW_TYPE_MORE_ITEMS_AVAILABLE -> return MoreItemsViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false), moreItemsCallback)
             VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder(LayoutInflater.from(context).inflate(R.layout.item_section_header, parent, false))

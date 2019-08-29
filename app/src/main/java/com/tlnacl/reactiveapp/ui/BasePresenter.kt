@@ -3,16 +3,14 @@ package com.tlnacl.reactiveapp.ui
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Created by tomt on 23/06/17.
  */
-abstract class BasePresenter<T : MvpView> : CoroutineScope {
+abstract class BasePresenter<T : MvpView> {
     private val job = Job()
 
-    override val coroutineContext: CoroutineContext
-        get() = job + Dispatchers.Main
+    protected val presenterScope = CoroutineScope(Dispatchers.Main + job)
 
     var mvpView: T? = null
 
