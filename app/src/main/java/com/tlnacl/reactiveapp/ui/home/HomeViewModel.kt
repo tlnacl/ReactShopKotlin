@@ -8,9 +8,7 @@ import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
 import com.tlnacl.reactiveapp.ui.BaseViewModel
-import io.reactivex.Observable
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.collect
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,14 +46,6 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
         if (currentViewState != homeViewState) {
             currentViewState = homeViewState
             Timber.d("render:$currentViewState")
-        }
-    }
-
-    fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
-        uiScope.launch {
-            homeUiEventObservable.collect { homeUiEvent ->
-                onUiEvent(homeUiEvent)
-            }
         }
     }
 
