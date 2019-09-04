@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Created by tomt on 23/06/17.
  */
-class SearchPrensenter
+class SearchPresenter
 @Inject constructor(val searchEngine: SearchEngine) : BasePresenter<SearchView>() {
     private val queryChannel = Channel<String?>(CONFLATED)
     fun initState() {

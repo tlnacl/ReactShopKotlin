@@ -14,14 +14,13 @@
         sothree:umanoShadowHeight="4dp">
 
         <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             android:orientation="vertical"
-            tools:context="com.hannesdorfmann.mosby3.sample.mvi.MainActivity">
+            tools:context="com.tlnacl.reactiveapp.ui.shop.ShopActivity">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -43,6 +42,6 @@
             android:id="@+id/shoppingCartFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.tlnacl.reactiveapp.ui.shop.ShoppingCartOverviewFragment"/>
+            android:name="com.tlnacl.reactiveapp.ui.shoppingcart.ShoppingCartOverviewFragment"/>
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 </FrameLayout>

@@ -33,7 +33,7 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
 
     private lateinit var adapter: SearchAdapter
 
-    @Inject lateinit var presenter: SearchPrensenter
+    @Inject lateinit var presenter: SearchPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

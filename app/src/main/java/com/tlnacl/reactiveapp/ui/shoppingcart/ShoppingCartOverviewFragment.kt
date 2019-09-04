@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp.ui.shop
+package com.tlnacl.reactiveapp.ui.shoppingcart
 
 import android.os.Bundle
 import android.view.LayoutInflater
