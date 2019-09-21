@@ -36,6 +36,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // TODO why HomeFragment OnCreate called twice on screen rotation
         Timber.d("HomeFragment OnCreate")
         (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
@@ -68,7 +69,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
         viewModel.getHomeLiveData().observe(this, Observer { render(it) })
 
-        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
+//        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)

@@ -18,7 +18,7 @@ class ProductDetailsViewModel @Inject constructor(private val api: ProductBacken
     // TODO change to viewEvent
     fun doAction(productId: Int) {
         productDetailsLD.value = ProductDetailsViewState.Loading
-        uiScope.launch {
+        viewModelScope.launch {
             try {
                 val product = api.getProduct(productId)
                 productDetailsLD.value = ProductDetailsViewState.Data(ProductDetail(product, false))

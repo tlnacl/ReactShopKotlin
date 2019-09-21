@@ -12,7 +12,7 @@ abstract class BaseViewModel : ViewModel() {
     // Job() or SupervisorJob()
     private val viewModelJob = Job()
 
-    protected val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    protected val viewModelScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     override fun onCleared() {
         super.onCleared()

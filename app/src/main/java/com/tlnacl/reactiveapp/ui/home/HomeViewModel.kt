@@ -12,9 +12,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- *
- */
 class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseViewModel() {
     private val homeLiveData = MutableLiveData<HomeViewState>()
 
@@ -23,6 +20,12 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
             field = value
             homeLiveData.value = value
         }
+
+    init {
+        // funny view model recreate when rotate screen
+        Timber.d("Init new HomeViewModel")
+        viewModelScope.launch { loadFirstPage() }
+    }
 
     fun getHomeLiveData(): LiveData<HomeViewState> {
         return homeLiveData
@@ -51,9 +54,9 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
 
     fun onUiEvent(uiEvent: HomeUiEvent) {
         Timber.i("homeUiEvent:$uiEvent")
-        uiScope.launch {
+        viewModelScope.launch {
             when (uiEvent) {
-                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+//                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
                 is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(uiEvent.categoryName)
                 is HomeUiEvent.LoadNextPage -> loadNextPage()
                 is HomeUiEvent.PullToRefresh -> pullToRefresh()
@@ -95,7 +98,7 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
     private suspend fun pullToRefresh() {
         try {
             processStateChange(StateChange.PullToRefreshLoading)
-            processStateChange(StateChange.NextPageLoaded(feedLoader.loadNewestPage()))
+            processStateChange(StateChange.PullToRefreshLoaded(feedLoader.loadNewestPage()))
         } catch (e: Exception) {
             processStateChange(StateChange.PullToRefreshError(e))
         }
