@@ -42,7 +42,7 @@ constructor(private val feedLoader: PagingFeedLoader) {
 
     suspend fun newestPage(): List<FeedItem> = groupByCategory(feedLoader.newestPage())
 
-    private suspend fun groupByCategory(originalListToGroup: List<Product>): List<FeedItem> {
+    private fun groupByCategory(originalListToGroup: List<Product>): List<FeedItem> {
         return originalListToGroup.groupBy { it.category }
                 .map {
                     val groupName = it.key

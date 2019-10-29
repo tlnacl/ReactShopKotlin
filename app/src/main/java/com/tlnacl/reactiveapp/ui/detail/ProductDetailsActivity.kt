@@ -6,8 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import coil.api.load
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
@@ -80,10 +79,8 @@ class ProductDetailsActivity : AppCompatActivity() {
             fab.setImageResource(R.drawable.ic_add_shopping_cart)
         }
 
-        Glide.with(this)
-                .load(Constants.BASE_IMAGE_URL + product?.image)
-                .apply(RequestOptions.centerCropTransform())
-                .into(backdrop)
+        backdrop.load(Constants.BASE_IMAGE_URL + product?.image)
+
     }
 
     private fun renderLoading() {

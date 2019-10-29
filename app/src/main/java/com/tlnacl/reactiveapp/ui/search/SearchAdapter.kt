@@ -1,26 +1,25 @@
 package com.tlnacl.reactiveapp.ui.search
 
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.tlnacl.reactiveapp.R
+import androidx.recyclerview.widget.RecyclerView
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 
 /**
  * Created by tomt on 21/06/17.
  */
-class SearchAdapter(private val context: Context,private val callback: ProductViewHolder.ProductClickedListener): androidx.recyclerview.widget.RecyclerView.Adapter<ProductViewHolder>(){
+class SearchAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener) : RecyclerView.Adapter<ProductViewHolder>() {
     private var products: List<Product> = emptyList()
 
-    fun setProducts(products:List<Product>){
+    fun setProducts(products: List<Product>) {
         this.products = products
         notifyDataSetChanged()
     }
 
-    override fun getItemCount()= products.size
+    override fun getItemCount() = products.size
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProductViewHolder(LayoutInflater.from(context).inflate(R.layout.item_more_available, null, false), callback)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProductViewHolder(context, parent, callback)
 
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) = holder.bind(products[position])
 

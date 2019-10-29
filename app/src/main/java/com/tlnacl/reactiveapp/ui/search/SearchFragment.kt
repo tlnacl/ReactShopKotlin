@@ -5,8 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionManager
-import com.jakewharton.rxbinding2.widget.RxSearchView
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
@@ -15,40 +16,28 @@ import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_errorview.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * Created by tomt on 21/06/17.
  */
-class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
+class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
     override fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
         activity!!.startActivity(i)
     }
 
-    private val binderJob = Job()
-    private val scope = CoroutineScope(Dispatchers.Main + binderJob)
     private var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
 
-    @Inject lateinit var presenter: SearchPrensenter
+    @Inject lateinit var presenter: SearchPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity!!.application as AndroidApplication).appComponent.inject(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binderJob.cancel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,19 +53,22 @@ class SearchFragment : androidx.fragment.app.Fragment(), SearchView, ProductView
         spanCount = resources.getInteger(R.integer.grid_span_size)
         adapter = SearchAdapter(activity!!, this)
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = androidx.recyclerview.widget.GridLayoutManager(activity, spanCount)
+        recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
         recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
                 resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
 
-        scope.launch {
-            presenter.onUiEvent(RxSearchView.queryTextChanges(searchView)
-                    .skip(2) // Because after screen orientation changes query Text will be resubmitted again
-                    .filter { queryString -> queryString.length > 3 || queryString.isEmpty() }
-                    .debounce(500, TimeUnit.MILLISECONDS)
-                    .distinctUntilChanged()
-                    .map { it.toString() })
-        }
+        searchView.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(queryString: String?): Boolean {
+                presenter.onUiEvent(queryString)
+                return true
+            }
 
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+        })
+
+        presenter.onUiEvent("")
     }
 
     override fun render(searchViewState: SearchViewState) {

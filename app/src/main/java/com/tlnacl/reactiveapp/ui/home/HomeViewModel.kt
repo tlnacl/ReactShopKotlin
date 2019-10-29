@@ -8,15 +8,10 @@ import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
 import com.tlnacl.reactiveapp.ui.BaseViewModel
-import io.reactivex.Observable
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.collect
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- *
- */
 class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseViewModel() {
     private val homeLiveData = MutableLiveData<HomeViewState>()
 
@@ -25,6 +20,12 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
             field = value
             homeLiveData.value = value
         }
+
+    init {
+        // funny view model recreate when rotate screen
+        Timber.d("Init new HomeViewModel")
+        viewModelScope.launch { loadFirstPage() }
+    }
 
     fun getHomeLiveData(): LiveData<HomeViewState> {
         return homeLiveData
@@ -51,17 +52,15 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
         }
     }
 
-    fun handleUiEvent(homeUiEventObservable: Observable<HomeUiEvent>) {
-        uiScope.launch {
-            homeUiEventObservable.collect { homeUiEvent ->
-                Timber.i("homeUiEvent:$homeUiEvent")
-                when (homeUiEvent) {
-                    is HomeUiEvent.LoadFirstPage -> loadFirstPage()
-                    is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(homeUiEvent.categoryName)
-                    is HomeUiEvent.LoadNextPage -> loadNextPage()
-                    is HomeUiEvent.PullToRefresh -> pullToRefresh()
-                    else -> pullToRefresh()
-                }
+    fun onUiEvent(uiEvent: HomeUiEvent) {
+        Timber.i("homeUiEvent:$uiEvent")
+        viewModelScope.launch {
+            when (uiEvent) {
+//                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
+                is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(uiEvent.categoryName)
+                is HomeUiEvent.LoadNextPage -> loadNextPage()
+                is HomeUiEvent.PullToRefresh -> pullToRefresh()
+                else -> pullToRefresh()
             }
         }
     }
@@ -99,7 +98,7 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
     private suspend fun pullToRefresh() {
         try {
             processStateChange(StateChange.PullToRefreshLoading)
-            processStateChange(StateChange.NextPageLoaded(feedLoader.loadNewestPage()))
+            processStateChange(StateChange.PullToRefreshLoaded(feedLoader.loadNewestPage()))
         } catch (e: Exception) {
             processStateChange(StateChange.PullToRefreshError(e))
         }
