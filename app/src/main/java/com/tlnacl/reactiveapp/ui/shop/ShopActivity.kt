@@ -28,7 +28,10 @@ class ShopActivity : AppCompatActivity() {
             true
         }
 
-        supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, HomeFragment()).commit()
+        // This is the fix for not create view model again for orientation change
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, HomeFragment()).commit()
+        }
     }
 
     private fun closeSlidingUpPanelIfOpen(): Boolean {

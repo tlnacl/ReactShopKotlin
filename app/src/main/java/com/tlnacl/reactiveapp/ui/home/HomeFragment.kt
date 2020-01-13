@@ -18,6 +18,7 @@ import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
+import com.tlnacl.reactiveapp.viewModelProvider
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -29,10 +30,11 @@ import javax.inject.Inject
 class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    lateinit var viewModel: HomeViewModel
-    var spanCount: Int = 2
+    lateinit var viewModel:HomeViewModel
 
+    var spanCount: Int = 2
     private lateinit var adapter: HomeAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,13 +44,12 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        Timber.d("HomeFragment onCreateView")
-        return view
+        return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = viewModelProvider(viewModelFactory)
         spanCount = resources.getInteger(R.integer.grid_span_size)
         var layoutManager = GridLayoutManager(activity, spanCount)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -66,10 +67,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = layoutManager
-        viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
-        viewModel.getHomeLiveData().observe(this, Observer { render(it) })
 
-//        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -78,6 +76,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
             }
         })
         swipeRefreshLayout.setOnRefreshListener { viewModel.onUiEvent(HomeUiEvent.PullToRefresh) }
+        viewModel.getHomeLiveData().observe(viewLifecycleOwner, Observer { render(it) })
     }
 
     override fun onProductClicked(product: Product) {
