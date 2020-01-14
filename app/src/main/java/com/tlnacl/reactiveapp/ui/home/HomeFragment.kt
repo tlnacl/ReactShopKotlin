@@ -38,7 +38,6 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO why HomeFragment OnCreate called twice on screen rotation
         Timber.d("HomeFragment OnCreate")
         (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
@@ -86,7 +85,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun loadItemsForCategory(category: String) {
-        viewModel.onUiEvent(HomeUiEvent.LoadFirstPage)
+        viewModel.onUiEvent(HomeUiEvent.LoadAllProductsFromCategory(category))
     }
 
     override fun render(homeViewState: HomeViewState) {
@@ -98,7 +97,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         } else if (homeViewState.firstPageError != null) {
             renderFirstPageError()
         } else {
-            throw IllegalStateException("Unknown view state " + homeViewState)
+            throw IllegalStateException("Unknown view state $homeViewState")
         }
     }
 

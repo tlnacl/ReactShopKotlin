@@ -45,7 +45,7 @@ class HomeAdapter(private val context: Context, private val productCallback: Pro
             VIEW_TYPE_SECTION_HEADER -> return SectionHederViewHolder(LayoutInflater.from(context).inflate(R.layout.item_section_header, parent, false))
         }
 
-        throw IllegalArgumentException("Couldn't create a ViewHolder for viewType  = " + viewType)
+        throw IllegalArgumentException("Couldn't create a ViewHolder for viewType  = $viewType")
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -58,7 +58,7 @@ class HomeAdapter(private val context: Context, private val productCallback: Pro
             is ProductViewHolder -> holder.bind(item as Product)
             is SectionHederViewHolder -> holder.onBind(item as SectionHeader)
             is MoreItemsViewHolder -> holder.bind(item as AdditionalItemsLoadable)
-            else -> throw IllegalArgumentException("couldn't accept  ViewHolder " + holder)
+            else -> throw IllegalArgumentException("couldn't accept  ViewHolder $holder")
         }
     }
 

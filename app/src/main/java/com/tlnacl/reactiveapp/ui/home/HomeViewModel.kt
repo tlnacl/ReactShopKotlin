@@ -3,16 +3,17 @@ package com.tlnacl.reactiveapp.ui.home
 import androidx.core.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
-import com.tlnacl.reactiveapp.ui.BaseViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseViewModel() {
+class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : ViewModel() {
     private val homeLiveData = MutableLiveData<HomeViewState>()
 
     private var currentViewState = HomeViewState(loadingFirstPage = true)
@@ -22,8 +23,6 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : BaseVi
         }
 
     init {
-        // funny view model recreate when rotate screen
-        Timber.d("Init new HomeViewModel")
         viewModelScope.launch { loadFirstPage() }
     }
 

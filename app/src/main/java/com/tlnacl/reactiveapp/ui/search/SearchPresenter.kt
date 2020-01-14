@@ -2,11 +2,9 @@ package com.tlnacl.reactiveapp.ui.search
 
 import com.tlnacl.reactiveapp.businesslogic.searchengine.SearchEngine
 import com.tlnacl.reactiveapp.ui.BasePresenter
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.distinct
-import kotlinx.coroutines.channels.filter
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,14 +13,14 @@ import javax.inject.Inject
  */
 class SearchPresenter
 @Inject constructor(val searchEngine: SearchEngine) : BasePresenter<SearchView>() {
-    private val queryChannel = Channel<String?>(CONFLATED)
+    private val queryChannel = BroadcastChannel<String?>(CONFLATED)
     fun initState() {
         presenterScope.launch {
             queryChannel
-                    .filter { queryString -> queryString.isNullOrEmpty() || queryString.length > 3  }
-//                    .debounce(500, TimeUnit.MILLISECONDS)
-                    .distinct()
-                    .consumeEach {
+                    .asFlow()
+                    .filter { queryString -> queryString.isNullOrEmpty() || queryString.length > 3 }
+                    .debounce(500)
+                    .onEach {// mapLatest
                         if (it.isNullOrEmpty()) mvpView?.render(SearchViewState.SearchNotStartedYet)
                         else {
                             try {
