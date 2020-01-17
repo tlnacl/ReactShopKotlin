@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ReactShopKotlin.iml" filepath="$PROJECT_DIR$/ReactShopKotlin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/ReactShopKotlin-app.iml" filepath="$PROJECT_DIR$/app/ReactShopKotlin-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/git-ReactShopKotlin.iml" filepath="$PROJECT_DIR$/git-ReactShopKotlin.iml" />
     </modules>
   </component>
 </project>
