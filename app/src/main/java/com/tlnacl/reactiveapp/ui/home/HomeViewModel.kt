@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : ViewModel() {
+class HomeViewModel(val feedLoader: HomeFeedLoader) : ViewModel() {
     private val homeLiveData = MutableLiveData<HomeViewState>()
 
     private var currentViewState = HomeViewState(loadingFirstPage = true)

@@ -26,8 +26,7 @@ import javax.inject.Inject
  * @author Hannes Dorfmann
  */
 
-class PagingFeedLoader @Inject
-constructor(private val backend: ProductBackendApiDecorator) {
+class PagingFeedLoader(private val backend: ProductBackendApiDecorator) {
     private var currentPage = 1
     private var endReached = false
     private var newestPageLoaded = false

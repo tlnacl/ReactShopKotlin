@@ -11,16 +11,15 @@ import javax.inject.Inject
 /**
  * Created by tomt on 23/06/17.
  */
-class SearchPresenter
-@Inject constructor(val searchEngine: SearchEngine) : BasePresenter<SearchView>() {
-    private val queryChannel = BroadcastChannel<String?>(CONFLATED)
+class SearchPresenter(val searchEngine: SearchEngine) : BasePresenter<SearchView>() {
+    private val queryChannel = Channel<String?>(CONFLATED)
     fun initState() {
         presenterScope.launch {
             queryChannel
-                    .asFlow()
-                    .filter { queryString -> queryString.isNullOrEmpty() || queryString.length > 3 }
-                    .debounce(500)
-                    .onEach {// mapLatest
+                    .filter { queryString -> queryString.isNullOrEmpty() || queryString.length > 3  }
+//                    .debounce(500, TimeUnit.MILLISECONDS)
+                    .distinct()
+                    .consumeEach {
                         if (it.isNullOrEmpty()) mvpView?.render(SearchViewState.SearchNotStartedYet)
                         else {
                             try {

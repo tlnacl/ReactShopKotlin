@@ -9,7 +9,7 @@ import com.tlnacl.reactiveapp.businesslogic.model.ProductDetail
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ProductDetailsViewModel @Inject constructor(private val api: ProductBackendApiDecorator): ViewModel() {
+class ProductDetailsViewModel(private val api: ProductBackendApiDecorator): ViewModel() {
     private val productDetailsLD = MutableLiveData<ProductDetailsViewState>()
 
     fun getProductDetails(): LiveData<ProductDetailsViewState> {

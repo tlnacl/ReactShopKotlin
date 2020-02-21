@@ -21,6 +21,8 @@ import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import com.tlnacl.reactiveapp.viewModelProvider
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
+import org.koin.androidx.scope.currentScope
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,9 +30,7 @@ import javax.inject.Inject
  * Created by tomt on 27/06/17.
  */
 class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    lateinit var viewModel:HomeViewModel
+    private val viewModel:HomeViewModel by currentScope.viewModel(this)
 
     var spanCount: Int = 2
     private lateinit var adapter: HomeAdapter
@@ -39,7 +39,6 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("HomeFragment OnCreate")
-        (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,7 +47,6 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
         spanCount = resources.getInteger(R.integer.grid_span_size)
         var layoutManager = GridLayoutManager(activity, spanCount)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {

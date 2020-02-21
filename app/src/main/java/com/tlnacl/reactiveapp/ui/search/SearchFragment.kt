@@ -16,6 +16,7 @@ import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_errorview.*
+import org.koin.androidx.scope.currentScope
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,11 +34,10 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
 
     private lateinit var adapter: SearchAdapter
 
-    @Inject lateinit var presenter: SearchPresenter
+    private val presenter: SearchPresenter by currentScope.inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity!!.application as AndroidApplication).appComponent.inject(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -13,6 +13,8 @@ import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
 import kotlinx.android.synthetic.main.activity_product_detail.*
 import kotlinx.android.synthetic.main.include_errorview.*
+import org.koin.androidx.scope.currentScope
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -25,17 +27,13 @@ class ProductDetailsActivity : AppCompatActivity() {
     private var product: Product? = null
     private var isProductInshoppingCart = false
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_detail)
-        (application as AndroidApplication).appComponent.inject(this)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Timber.d("onCreate")
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
+        val viewModel:ProductDetailsViewModel by currentScope.viewModel(this)
         viewModel.getProductDetails().observe(this, Observer {
             render(it)
         })

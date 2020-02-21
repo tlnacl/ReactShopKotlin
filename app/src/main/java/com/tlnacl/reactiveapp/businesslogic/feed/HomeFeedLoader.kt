@@ -28,8 +28,7 @@ import javax.inject.Inject
  *
  * @author Hannes Dorfmann
  */
-class HomeFeedLoader @Inject
-constructor(private val groupedLoader: GroupedPagedFeedLoader,
+class HomeFeedLoader(private val groupedLoader: GroupedPagedFeedLoader,
             private val backendApi: ProductBackendApiDecorator) {
 
     /**

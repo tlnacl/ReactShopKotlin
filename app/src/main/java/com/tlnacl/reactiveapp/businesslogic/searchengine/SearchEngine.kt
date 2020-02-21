@@ -27,8 +27,7 @@ import javax.inject.Inject
  *
  * @author Hannes Dorfmann
  */
-class SearchEngine @Inject
-constructor(private val backend: ProductBackendApiDecorator) {
+class SearchEngine(private val backend: ProductBackendApiDecorator) {
 
     suspend fun searchFor(searchQueryText: String): List<Product> {
 

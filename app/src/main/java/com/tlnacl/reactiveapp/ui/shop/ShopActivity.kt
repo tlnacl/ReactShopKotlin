@@ -13,7 +13,6 @@ class ShopActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop)
-        (application as AndroidApplication).appComponent.inject(this)
 
         toolbar.title = "Reactive App"
         toolbar.inflateMenu(R.menu.activity_main_toolbar)

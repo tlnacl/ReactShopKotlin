@@ -34,8 +34,7 @@ import javax.inject.Inject
  *
  * @author Hannes Dorfmann
  */
-class ProductBackendApiDecorator @Inject
-constructor(private val api: ProductBackendApi) {
+class ProductBackendApiDecorator(private val api: ProductBackendApi) {
 
     /**
      * Get a list with all products from backend, in parallel

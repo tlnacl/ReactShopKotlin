@@ -41,6 +41,7 @@ dependencies {
     def retrofitVersion = '2.6.0'
     def okHttpVersion = '4.0.0'
     def daggerVersion = '2.23'
+    def koin_version = '2.0.1'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
@@ -70,6 +71,14 @@ dependencies {
 
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    // Koin for Android
+    implementation "org.koin:koin-android:$koin_version"
+// Koin AndroidX Scope features
+    implementation "org.koin:koin-androidx-scope:$koin_version"
+// Koin AndroidX ViewModel features
+    implementation "org.koin:koin-androidx-viewmodel:$koin_version"
+
 
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'

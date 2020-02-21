@@ -32,8 +32,7 @@ import javax.inject.Inject
  *
  * @author Hannes Dorfmann
  */
-class GroupedPagedFeedLoader @Inject
-constructor(private val feedLoader: PagingFeedLoader) {
+class GroupedPagedFeedLoader(private val feedLoader: PagingFeedLoader) {
     private val collapsedGroupProductItemCount = 3
 
     suspend fun groupedFirstPage(): List<FeedItem> = groupedNextPage()
