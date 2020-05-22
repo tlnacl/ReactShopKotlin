@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
  * val myViewModel = viewModelProvider(myViewModelFactory)
  * ```
  */
-inline fun <reified VM : ViewModel> Fragment.viewModelProvider(
-        provider: ViewModelProvider.Factory
-) =
-        ViewModelProviders.of(this, provider).get(VM::class.java)
+
+inline fun <reified VM : ViewModel> Fragment.provideViewModel(provider: ViewModelProvider.Factory): VM {
+    return ViewModelProvider(this, provider).get(VM::class.java)
+}

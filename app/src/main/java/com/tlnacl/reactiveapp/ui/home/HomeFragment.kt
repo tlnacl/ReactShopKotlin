@@ -14,11 +14,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.provideViewModel
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
-import com.tlnacl.reactiveapp.viewModelProvider
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -48,7 +48,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = viewModelProvider(viewModelFactory)
+        viewModel = provideViewModel(viewModelFactory)
         spanCount = resources.getInteger(R.integer.grid_span_size)
         var layoutManager = GridLayoutManager(activity, spanCount)
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
