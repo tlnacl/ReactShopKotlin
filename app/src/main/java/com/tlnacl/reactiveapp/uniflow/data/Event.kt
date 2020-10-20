@@ -3,7 +3,7 @@ package com.tlnacl.reactiveapp.uniflow.data
 /**
  * Data Flow Event wrapper
  */
-data class Event<out T : UIEvent>(private val content: T) {
+data class Event<out T : ViewEvent>(private val content: T) {
 
     var hasBeenHandled = false
         private set // Allow external read but not write

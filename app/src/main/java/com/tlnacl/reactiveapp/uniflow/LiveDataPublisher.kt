@@ -4,28 +4,28 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tlnacl.reactiveapp.onMain
 import com.tlnacl.reactiveapp.uniflow.data.Event
-import com.tlnacl.reactiveapp.uniflow.data.UIEvent
-import com.tlnacl.reactiveapp.uniflow.data.UIState
+import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
+import com.tlnacl.reactiveapp.uniflow.data.ViewState
 
-class LiveDataPublisher(defaultState: UIState) {
-    private val _states = MutableLiveData<UIState>()
-    private val _events = MutableLiveData<Event<UIEvent>>()
+class LiveDataPublisher(defaultState: ViewState) {
+    private val _states = MutableLiveData<ViewState>()
+    private val _events = MutableLiveData<Event<ViewEvent>>()
 
     //For immutable
-    val states: LiveData<UIState> = _states
-    val events: LiveData<Event<UIEvent>> = _events
+    val states: LiveData<ViewState> = _states
+    val events: LiveData<Event<ViewEvent>> = _events
 
     init {
         _states.value = defaultState
     }
 
-    suspend fun publishState(state: UIState) {
+    suspend fun publishState(state: ViewState) {
         onMain(immediate = true) {
             _states.value = state
         }
     }
 
-    suspend fun publishEvent(event: UIEvent) {
+    suspend fun publishEvent(event: ViewEvent) {
         onMain(immediate = true) {
             _events.value = Event(event)
         }

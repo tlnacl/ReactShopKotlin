@@ -3,7 +3,6 @@ package com.tlnacl.reactiveapp.ui.detail
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionManager
 import coil.api.load
@@ -11,7 +10,7 @@ import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import com.tlnacl.reactiveapp.uniflow.data.UIState
+import com.tlnacl.reactiveapp.uniflow.data.ViewState
 import com.tlnacl.reactiveapp.uniflow.onStates
 import kotlinx.android.synthetic.main.activity_product_detail.*
 import kotlinx.android.synthetic.main.include_errorview.*
@@ -41,8 +40,8 @@ class ProductDetailsActivity : AppCompatActivity() {
 
         onStates(viewModel) {state ->
             when (state) {
-                is UIState.Loading -> renderLoading()
-                is UIState.Failed -> renderError()
+                is ViewState.Loading -> renderLoading()
+                is ViewState.Failed -> renderError()
                 is ProductDetailsViewState -> renderData(state)
             }
         }
