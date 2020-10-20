@@ -1,12 +1,10 @@
 package com.tlnacl.reactiveapp.ui.detail
 
 import com.tlnacl.reactiveapp.businesslogic.model.ProductDetail
+import com.tlnacl.reactiveapp.uniflow.data.UIState
 
 /**
  * Created by tlnacl on 11/07/17.
  */
-sealed class ProductDetailsViewState {
-    object Loading : ProductDetailsViewState()
-    data class Error(val error: Throwable) : ProductDetailsViewState()
-    data class Data(val data: ProductDetail) : ProductDetailsViewState()
-}
+data class ProductDetailsViewState(val data: ProductDetail) : UIState()
+

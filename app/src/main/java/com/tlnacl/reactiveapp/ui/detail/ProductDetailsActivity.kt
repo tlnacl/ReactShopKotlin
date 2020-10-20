@@ -11,6 +11,8 @@ import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.uniflow.data.UIState
+import com.tlnacl.reactiveapp.uniflow.onStates
 import kotlinx.android.synthetic.main.activity_product_detail.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -36,21 +38,16 @@ class ProductDetailsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Timber.d("onCreate")
         val viewModel = ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
-        viewModel.getProductDetails().observe(this, Observer {
-            render(it)
-        })
 
-        viewModel.doAction(intent.getIntExtra(KEY_PRODUCT_ID, 0))
-    }
-
-    private fun render(productDetailsViewState: ProductDetailsViewState) {
-        Timber.d("render $productDetailsViewState")
-
-        when (productDetailsViewState) {
-            is ProductDetailsViewState.Loading -> renderLoading()
-            is ProductDetailsViewState.Data -> renderData(productDetailsViewState)
-            is ProductDetailsViewState.Error -> renderError()
+        onStates(viewModel) {state ->
+            when (state) {
+                is UIState.Loading -> renderLoading()
+                is UIState.Failed -> renderError()
+                is ProductDetailsViewState -> renderData(state)
+            }
         }
+
+        viewModel.getDetail(intent.getIntExtra(KEY_PRODUCT_ID, 0))
     }
 
     private fun renderError() {
@@ -60,7 +57,7 @@ class ProductDetailsActivity : AppCompatActivity() {
         detailsView.visibility = View.GONE
     }
 
-    private fun renderData(state: ProductDetailsViewState.Data) {
+    private fun renderData(state: ProductDetailsViewState) {
         TransitionManager.beginDelayedTransition(rootView)
         errorView.visibility = View.GONE
         loadingView.visibility = View.GONE

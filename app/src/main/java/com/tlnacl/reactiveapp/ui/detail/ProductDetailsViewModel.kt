@@ -6,27 +6,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.ProductDetail
+import com.tlnacl.reactiveapp.uniflow.DataFlowBaseViewModel
+import com.tlnacl.reactiveapp.uniflow.data.UIState
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ProductDetailsViewModel @Inject constructor(private val api: ProductBackendApiDecorator): ViewModel() {
-    private val productDetailsLD = MutableLiveData<ProductDetailsViewState>()
+class ProductDetailsViewModel @Inject constructor(private val api: ProductBackendApiDecorator): DataFlowBaseViewModel() {
 
-    fun getProductDetails(): LiveData<ProductDetailsViewState> {
-        return productDetailsLD
-    }
-
-    // TODO change to viewEvent
-    fun doAction(productId: Int) {
-        productDetailsLD.value = ProductDetailsViewState.Loading
-
-        viewModelScope.launch {
-            try {
+    fun getDetail(productId: Int) = action(
+            onAction = {
                 val product = api.getProduct(productId)
-                productDetailsLD.value = ProductDetailsViewState.Data(ProductDetail(product, false))
-            } catch (e : Exception) {
-                productDetailsLD.value = ProductDetailsViewState.Error(e)
-            }
-        }
-    }
+                setState(ProductDetailsViewState(ProductDetail(product, false)))
+            },
+            onError = { error,_ -> setState { UIState.Failed("getProduct failed", error) }}
+    )
 }
