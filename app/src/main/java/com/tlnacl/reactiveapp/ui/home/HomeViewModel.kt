@@ -1,147 +1,87 @@
 package com.tlnacl.reactiveapp.ui.home
 
 import androidx.core.util.Pair
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import com.tlnacl.reactiveapp.uniflow.DataFlowBaseViewModel
+import com.tlnacl.reactiveapp.uniflow.actionOn
+import com.tlnacl.reactiveapp.uniflow.data.ViewState
 import javax.inject.Inject
 
-class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : ViewModel() {
-    private val homeLiveData = MutableLiveData<HomeViewState>()
+class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) : DataFlowBaseViewModel(defaultState = ViewState.Loading) {
+    fun loadFirstPage() = action(
+            onAction = {
+                setState(HomeViewState(data = feedLoader.loadFirstPage()))
+            },
+            onError = { error, _ -> setState(ViewState.Failed("loadFirstPage failed", error)) }
+    )
 
-    private var currentViewState = HomeViewState(loadingFirstPage = true)
-        set(value) {
-            field = value
-            homeLiveData.value = value
-        }
+    fun loadAllProductsFromCategory(categoryName: String) = actionOn<HomeViewState>(
+            onAction = { currentState ->
+                setState { handleProductsOfCategoryLoading(currentState, categoryName) }
+                val products = feedLoader.loadProductsOfCategory(categoryName)
+                setState { handleProductsOfCategoryLoaded(currentState, categoryName, products) }
+            },
+            onError = { error, currentState ->
+                when(currentState) {
+                    is HomeViewState -> {
+                        val found = findAdditionalItems(categoryName, currentState.data)
+                        val foundItem = found.second
+                        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount, foundItem.categoryName, false, error)
 
-    init {
-        viewModelScope.launch { loadFirstPage() }
-    }
+                        val data = ArrayList<FeedItem>(currentState.data.size)
+                        data.addAll(currentState.data)
+                        data[found.first!!] = toInsert
+                        setState(currentState.copy(data = data))
+                    }
+                    else -> sendEvent(HomeViewEvent.Error(error))
+                }
+             })
 
-    fun getHomeLiveData(): LiveData<HomeViewState> {
-        return homeLiveData
-    }
+    fun loadNextPage() = actionOn<HomeViewState>(
+            onAction = { currentState ->
+                setState { currentState.copy(loadingNextPage = true) }
+                val items = feedLoader.loadNextPage()
+                setState { handleNextPageLoaded(currentState, items) }
+            },
+            onError = { error, _ -> sendEvent(HomeViewEvent.Error(error)) })
 
-    private fun processStateChange(stateChange: StateChange) {
-        val homeViewState = when (stateChange) {
-            is StateChange.FirstPageLoading -> HomeViewState(loadingFirstPage = true)
-            is StateChange.FirstPageLoaded -> HomeViewState(data = stateChange.data)
-            is StateChange.FirstPageError -> HomeViewState(firstPageError = stateChange.error)
-            is StateChange.ProductsOfCategoryLoading -> handleProductsOfCategoryLoading(currentViewState, stateChange)
-            is StateChange.ProductsOfCategoryLoaded -> handleProductsOfCategoryLoaded(currentViewState, stateChange)
-            is StateChange.ProductsOfCategoryError -> handleProductsOfCategoryError(currentViewState, stateChange)
-            is StateChange.NextPageLoading -> currentViewState.copy(loadingNextPage = true, nextPageError = null)
-            is StateChange.NextPageLoaded -> handleNextPageLoaded(currentViewState, stateChange)
-            is StateChange.NextPageError -> currentViewState.copy(loadingNextPage = false, nextPageError = stateChange.error)
-            is StateChange.PullToRefreshLoading -> currentViewState.copy(loadingPullToRefresh = true, pullToRefreshError = null)
-            is StateChange.PullToRefreshLoaded -> handlePullToRefreshLoaded(currentViewState, stateChange)
-            is StateChange.PullToRefreshError -> currentViewState.copy(loadingPullToRefresh = false, pullToRefreshError = stateChange.error)
-        }
-        if (currentViewState != homeViewState) {
-            currentViewState = homeViewState
-            Timber.d("render:$currentViewState")
-        }
-    }
+    fun pullToRefresh() = actionOn<HomeViewState>(
+            onAction = { currentState ->
+                setState { currentState.copy(loadingPullToRefresh = true) }
+                val items = feedLoader.loadNewestPage()
+                setState { handlePullToRefreshLoaded(currentState, items) }
+                sendEvent(HomeViewEvent.PullToRefreshSuccess)
+            },
+            onError = { error, _ -> sendEvent(HomeViewEvent.Error(error)) })
 
-    fun onUiEvent(uiEvent: HomeUiEvent) {
-        Timber.i("homeUiEvent:$uiEvent")
-        viewModelScope.launch {
-            when (uiEvent) {
-//                is HomeUiEvent.LoadFirstPage -> loadFirstPage()
-                is HomeUiEvent.LoadAllProductsFromCategory -> loadAllProductsFromCategory(uiEvent.categoryName)
-                is HomeUiEvent.LoadNextPage -> loadNextPage()
-                is HomeUiEvent.PullToRefresh -> pullToRefresh()
-                else -> pullToRefresh()
-            }
-        }
-    }
-
-    private suspend fun loadFirstPage() {
-        Timber.d("loadFirstPage")
-        try {
-            processStateChange(StateChange.FirstPageLoading)
-            processStateChange(StateChange.FirstPageLoaded(feedLoader.loadFirstPage()))
-        } catch (e: Exception) {
-            processStateChange(StateChange.FirstPageError(e))
-        }
-    }
-
-    private suspend fun loadAllProductsFromCategory(categoryName: String) {
-        Timber.d("loadAllProductsFromCategory")
-        try {
-            processStateChange(StateChange.ProductsOfCategoryLoading(categoryName))
-            val productsOfCategory = feedLoader.loadProductsOfCategory(categoryName)
-            processStateChange(StateChange.ProductsOfCategoryLoaded(categoryName, productsOfCategory))
-        } catch (e: Exception) {
-            processStateChange(StateChange.ProductsOfCategoryError(categoryName, e))
-        }
-    }
-
-    private suspend fun loadNextPage() {
-        try {
-            processStateChange(StateChange.NextPageLoading)
-            processStateChange(StateChange.NextPageLoaded(feedLoader.loadNextPage()))
-        } catch (e: Exception) {
-            processStateChange(StateChange.NextPageError(e))
-        }
-    }
-
-    private suspend fun pullToRefresh() {
-        try {
-            processStateChange(StateChange.PullToRefreshLoading)
-            processStateChange(StateChange.PullToRefreshLoaded(feedLoader.loadNewestPage()))
-        } catch (e: Exception) {
-            processStateChange(StateChange.PullToRefreshError(e))
-        }
-    }
-
-    private fun handleNextPageLoaded(homeViewState: HomeViewState, stateChange: StateChange.NextPageLoaded): HomeViewState {
+    private fun handleNextPageLoaded(homeViewState: HomeViewState, items: List<FeedItem>): HomeViewState {
         val data = ArrayList<FeedItem>()
         data.addAll(homeViewState.data)
-        data.addAll(stateChange.data)
-        return homeViewState.copy(data = data, loadingNextPage = false, nextPageError = null)
+        data.addAll(items)
+        return homeViewState.copy(data = data, loadingNextPage = false)
     }
 
-    private fun handlePullToRefreshLoaded(homeViewState: HomeViewState, stateChange: StateChange.PullToRefreshLoaded): HomeViewState {
+    private fun handlePullToRefreshLoaded(homeViewState: HomeViewState, items: List<FeedItem>): HomeViewState {
         val data = ArrayList<FeedItem>()
-        data.addAll(stateChange.data)
+        data.addAll(items)
         data.addAll(homeViewState.data)
-        return homeViewState.copy(data = data, loadingPullToRefresh = false, pullToRefreshError = null)
+        return homeViewState.copy(data = data, loadingPullToRefresh = false)
     }
 
-    private fun handleProductsOfCategoryError(homeViewState: HomeViewState, stateChange: StateChange.ProductsOfCategoryError): HomeViewState {
-        val found = findAdditionalItems(stateChange.categoryName, homeViewState.data)
-        val foundItem = found.second
-        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount,
-                foundItem.categoryName, false,
-                stateChange.error)
+    private fun handleProductsOfCategoryLoaded(homeViewState: HomeViewState, categoryName: String, items: List<FeedItem>): HomeViewState {
+        val found = findAdditionalItems(categoryName, homeViewState.data)
 
-        val data = ArrayList<FeedItem>(homeViewState.data.size)
-        data.addAll(homeViewState.data)
-        data[found.first!!] = toInsert
-        return homeViewState.copy(data = data)
-    }
-
-    private fun handleProductsOfCategoryLoaded(homeViewState: HomeViewState, stateChange: StateChange.ProductsOfCategoryLoaded): HomeViewState {
-        val found = findAdditionalItems(stateChange.categoryName, homeViewState.data)
-
-        val data = ArrayList<FeedItem>(homeViewState.data.size + stateChange.data.size)
+        val data = ArrayList<FeedItem>(homeViewState.data.size + items.size)
         data.addAll(homeViewState.data)
 
         // Search for the section header
         var sectionHeaderIndex = -1
         for (i in found.first!! downTo 0) {
             val item = homeViewState.data[i]
-            if (item is SectionHeader && item.name
-                            .equals(stateChange.categoryName)) {
+            if (item is SectionHeader && item.name == categoryName) {
                 sectionHeaderIndex = i
                 break
             }
@@ -151,15 +91,15 @@ class HomeViewModel @Inject constructor(val feedLoader: HomeFeedLoader) : ViewMo
         }
 
         if (sectionHeaderIndex < 0) {
-            throw RuntimeException("Couldn't find the section header for category " + stateChange.categoryName)
+            throw RuntimeException("Couldn't find the section header for category $categoryName")
         }
 
-        data.addAll(sectionHeaderIndex + 1, stateChange.data)
+        data.addAll(sectionHeaderIndex + 1, items)
         return homeViewState.copy(data = data)
     }
 
-    private fun handleProductsOfCategoryLoading(homeViewState: HomeViewState, stateChange: StateChange.ProductsOfCategoryLoading): HomeViewState {
-        val found = findAdditionalItems(stateChange.categoryName, homeViewState.data)
+    private fun handleProductsOfCategoryLoading(homeViewState: HomeViewState, categoryName: String): HomeViewState {
+        val found = findAdditionalItems(categoryName, homeViewState.data)
         val foundItem = found.second
         val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount,
                 foundItem.categoryName, true, null)

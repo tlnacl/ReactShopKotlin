@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +18,9 @@ import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
+import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.uniflow.onEvents
+import com.tlnacl.reactiveapp.uniflow.onStates
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -27,7 +29,7 @@ import javax.inject.Inject
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
+class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     lateinit var viewModel:HomeViewModel
@@ -71,11 +73,24 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 if (!adapter.isLoadingNextPage() && newState == RecyclerView.SCROLL_STATE_IDLE && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1)
-                    viewModel.onUiEvent(HomeUiEvent.LoadNextPage)
+                    viewModel.loadNextPage()
             }
         })
-        swipeRefreshLayout.setOnRefreshListener { viewModel.onUiEvent(HomeUiEvent.PullToRefresh) }
-        viewModel.getHomeLiveData().observe(viewLifecycleOwner, Observer { render(it) })
+        swipeRefreshLayout.setOnRefreshListener { viewModel.pullToRefresh() }
+        onStates(viewModel) {viewState ->
+            when (viewState) {
+                is ViewState.Loading -> renderFirstPageLoading()
+                is ViewState.Failed -> renderFirstPageError()
+                is HomeViewState -> renderShowData(viewState)
+            }
+        }
+        onEvents(viewModel) { event ->
+            when (val data = event.take()) {
+                is HomeViewEvent.PullToRefreshSuccess -> recyclerView.smoothScrollToPosition(0)
+                is HomeViewEvent.Error -> Snackbar.make(view, R.string.error_unknown, Snackbar.LENGTH_LONG).show()
+            }
+        }
+        viewModel.loadFirstPage()
     }
 
     override fun onProductClicked(product: Product) {
@@ -85,20 +100,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
     }
 
     override fun loadItemsForCategory(category: String) {
-        viewModel.onUiEvent(HomeUiEvent.LoadAllProductsFromCategory(category))
-    }
-
-    override fun render(homeViewState: HomeViewState) {
-        Timber.i("render %s", homeViewState)
-        if (!homeViewState.loadingFirstPage && homeViewState.firstPageError == null) {
-            renderShowData(homeViewState)
-        } else if (homeViewState.loadingFirstPage) {
-            renderFirstPageLoading()
-        } else if (homeViewState.firstPageError != null) {
-            renderFirstPageError()
-        } else {
-            throw IllegalStateException("Unknown view state $homeViewState")
-        }
+        viewModel.loadAllProductsFromCategory(category)
     }
 
     private fun renderShowData(state: HomeViewState) {
@@ -113,25 +115,7 @@ class HomeFragment : Fragment(), HomeView, ProductViewHolder.ProductClickedListe
         }
         adapter.setItems(state.data)
 
-        val pullToRefreshFinished = swipeRefreshLayout.isRefreshing
-                && !state.loadingPullToRefresh
-                && state.pullToRefreshError == null
-        if (pullToRefreshFinished) {
-            // Swipe to refresh finished successfully so scroll to the top of the list (to see inserted items)
-            recyclerView.smoothScrollToPosition(0)
-        }
-
         swipeRefreshLayout.isRefreshing = state.loadingPullToRefresh
-
-        if (state.nextPageError != null) {
-            Snackbar.make(view!!, R.string.error_unknown, Snackbar.LENGTH_LONG)
-                    .show() // TODO callback
-        }
-
-        if (state.pullToRefreshError != null) {
-            Snackbar.make(view!!, R.string.error_unknown, Snackbar.LENGTH_LONG)
-                    .show() // TODO callback
-        }
     }
 
     private fun renderFirstPageLoading() {

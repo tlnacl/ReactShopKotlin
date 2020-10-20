@@ -39,6 +39,7 @@ class ProductDetailsActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
 
         onStates(viewModel) {state ->
+
             when (state) {
                 is ViewState.Loading -> renderLoading()
                 is ViewState.Failed -> renderError()
