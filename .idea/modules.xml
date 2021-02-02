@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ReactShopKotlin.iml" filepath="$PROJECT_DIR$/ReactShopKotlin.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ReactShopKotlin.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ReactShopKotlin.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mycode.ReactShopKotlin.iml" filepath="$PROJECT_DIR$/.idea/modules/mycode.ReactShopKotlin.iml" />
     </modules>
   </component>
 </project>

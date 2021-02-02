@@ -1,19 +1,20 @@
 package com.tlnacl.reactiveapp
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
-object DispatcherProvider {
-    var dispatchers: DispatcherConfiguration = ApplicationDispatchers()
+/**
+ * use DispatcherProvider instead of hard code dispatcher for unit test
+ */
+interface DispatcherProvider {
+
+    fun main(): CoroutineDispatcher = Dispatchers.Main
+    fun default(): CoroutineDispatcher = Dispatchers.Default
+    fun io(): CoroutineDispatcher = Dispatchers.IO
+    fun unconfined(): CoroutineDispatcher = Dispatchers.Unconfined
 }
 
-interface DispatcherConfiguration {
-    fun main(): CoroutineDispatcher
-    fun default(): CoroutineDispatcher
-    fun io(): CoroutineDispatcher
-}
-
-class ApplicationDispatchers : DispatcherConfiguration {
-    override fun main() = kotlinx.coroutines.Dispatchers.Main
-    override fun default() = kotlinx.coroutines.Dispatchers.Default
-    override fun io() = kotlinx.coroutines.Dispatchers.IO
+class DefaultDispatcherProvider : DispatcherProvider
+object AppCoroutineDispatcher {
+    var dispatcher: DispatcherProvider = DefaultDispatcherProvider()
 }

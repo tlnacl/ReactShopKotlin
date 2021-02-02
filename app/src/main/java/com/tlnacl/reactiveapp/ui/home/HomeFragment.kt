@@ -85,7 +85,7 @@ class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreI
             }
         }
         onEvents(viewModel) { event ->
-            when (val data = event.take()) {
+            when (event) {
                 is HomeViewEvent.PullToRefreshSuccess -> recyclerView.smoothScrollToPosition(0)
                 is HomeViewEvent.Error -> Snackbar.make(view, R.string.error_unknown, Snackbar.LENGTH_LONG).show()
             }
