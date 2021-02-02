@@ -15,7 +15,7 @@ class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) 
             onAction = {
                 setState(HomeViewState(data = feedLoader.loadFirstPage()))
             },
-            onError = { error, _ -> setState(ViewState.Failed("loadFirstPage failed", error)) }
+            onError = { error, _ -> setState(ViewState.Failed) }
     )
 
     fun loadAllProductsFromCategory(categoryName: String) = actionOn<HomeViewState>(
