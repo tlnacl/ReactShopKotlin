@@ -66,8 +66,8 @@ class ProductDetailsActivity : AppCompatActivity() {
         isProductInshoppingCart = state.data.isInShoppingCart
         product = state.data.product
         price.text = "Price: $" + String.format(Locale.US, "%.2f", product?.price)
-        description.text = product?.getDescription()
-        toolbar.title = product?.getName()
+        description.text = product?.description
+        toolbar.title = product?.name
         collapsingToolbar.title = product?.name
 
         if (isProductInshoppingCart) {

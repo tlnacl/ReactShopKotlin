@@ -21,7 +21,7 @@ class ShoppingCart {
      */
     suspend fun addProduct(product: Product) {
         val updatedShoppingCart = ArrayList<Product>()
-        updatedShoppingCart.addAll(itemsInShoppingCart.value!!)
+        updatedShoppingCart.addAll(itemsInShoppingCart.value)
         updatedShoppingCart.add(product)
         itemsInShoppingCart.send(updatedShoppingCart)
     }
@@ -31,7 +31,7 @@ class ShoppingCart {
      */
     suspend fun removeProduct(product: Product) {
         val updatedShoppingCart = ArrayList<Product>()
-        updatedShoppingCart.addAll(itemsInShoppingCart.value!!)
+        updatedShoppingCart.addAll(itemsInShoppingCart.value)
         updatedShoppingCart.remove(product)
         itemsInShoppingCart.send(updatedShoppingCart)
     }
@@ -41,7 +41,7 @@ class ShoppingCart {
      */
     suspend fun removeProducts(products: List<Product>) {
         val updatedShoppingCart = ArrayList<Product>()
-        updatedShoppingCart.addAll(itemsInShoppingCart.value!!)
+        updatedShoppingCart.addAll(itemsInShoppingCart.value)
         updatedShoppingCart.removeAll(products)
         itemsInShoppingCart.send(updatedShoppingCart)
     }
