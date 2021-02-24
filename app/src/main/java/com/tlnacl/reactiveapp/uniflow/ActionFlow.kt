@@ -9,25 +9,21 @@ typealias ActionErrorFunction = suspend ActionFlow.(Exception, ViewState) -> (Un
 class ActionFlow(
         val onAction: ActionFunction<ViewState>,
         val onError: ActionErrorFunction,
-        private val dataStore: ViewDataStore
+        private val dataPublisher: LiveDataPublisher
 ) {
     suspend fun setState(state: ViewState) {
-        dataStore.pushNewData(state)
+        dataPublisher.publishState(state)
     }
 
     suspend fun setState(state: () -> ViewState) {
-        dataStore.pushNewData(state())
-    }
-
-    suspend fun setStateAsync(state: suspend () -> ViewState) {
-        dataStore.pushNewData(state())
+        dataPublisher.publishState(state())
     }
 
     suspend fun sendEvent(event: ViewEvent) {
-        dataStore.pushNewData(event)
+        dataPublisher.publishEvent(event)
     }
 
     suspend fun sendEvent(event: () -> ViewEvent) {
-        dataStore.pushNewData(event())
+        dataPublisher.publishEvent(event())
     }
 }

@@ -13,9 +13,8 @@ abstract class DataFlowBaseViewModel(
 ) : ViewModel(), DataFlow {
     private val tag = this.toString()
     val dataPublisher: LiveDataPublisher = LiveDataPublisher(defaultState, dispatcherProvider)
-    private val dataStore: ViewDataStore = ViewDataStore(dataPublisher, defaultState)
     private val actionDispatcher: ActionDispatcher
-        get() = ActionDispatcher(viewModelScope, dataStore, this, dispatcherProvider, tag)
+        get() = ActionDispatcher(viewModelScope, dataPublisher, this, dispatcherProvider, tag)
 
     final override fun getCurrentState() = actionDispatcher.getCurrentState()
     final override fun action(onAction: ActionFunction<ViewState>): ActionFlow = actionDispatcher.action(onAction)

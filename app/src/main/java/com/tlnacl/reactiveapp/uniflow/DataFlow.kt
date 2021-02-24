@@ -1,5 +1,6 @@
 package com.tlnacl.reactiveapp.uniflow
 
+import com.tlnacl.reactiveapp.BuildConfig
 import com.tlnacl.reactiveapp.uniflow.data.ViewState
 import timber.log.Timber
 import kotlin.reflect.KClass
@@ -14,10 +15,13 @@ interface DataFlow {
     fun <T : ViewState> actionOn(stateClass: KClass<T>, onAction: ActionFunction<T>): ActionFlow
     fun <T : ViewState> actionOn(stateClass: KClass<T>, onAction: ActionFunction<T>, onError: ActionErrorFunction): ActionFlow
     suspend fun onError(error: Exception, currentState: ViewState, flow: ActionFlow) {
-        Timber.e("Uncaught error: $error with $currentState")
-        error.printStackTrace()
-//        Swallow error by default
-//        throw error
+        if (BuildConfig.DEBUG) {
+            throw error
+        } else {
+            // Swallow error in prod
+            Timber.e("Uncaught error: $error with $currentState")
+            error.printStackTrace()
+        }
     }
 }
 

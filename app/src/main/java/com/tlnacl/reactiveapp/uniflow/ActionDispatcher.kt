@@ -1,21 +1,21 @@
 package com.tlnacl.reactiveapp.uniflow
 
 import com.tlnacl.reactiveapp.DispatcherProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
 import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.reflect.KClass
 
 class ActionDispatcher(
         private val coroutineScope: CoroutineScope,
-        private val dataStore: ViewDataStore,
+        private val dataPublisher: LiveDataPublisher,
         private val dataFlow: DataFlow,
         private val dispatcherProvider: DispatcherProvider,
         val tag: String
 ) {
-    fun getCurrentState(): ViewState = dataStore.currentState
+    fun getCurrentState(): ViewState = dataPublisher.currentState
 
     fun action(onAction: ActionFunction<ViewState>): ActionFlow = action(onAction) { error, state -> dataFlow.onError(error, state, this) }
 
@@ -29,7 +29,7 @@ class ActionDispatcher(
     fun <T : ViewState> actionOn(stateClass: KClass<T>, onAction: ActionFunction<T>, onError: ActionErrorFunction): ActionFlow {
         val currentState = getCurrentState()
         return if (stateClass.isInstance(currentState)) {
-            val action = ActionFlow(onAction as ActionFunction<ViewState>, onError, dataStore)
+            val action = ActionFlow(onAction as ActionFunction<ViewState>, onError, dataPublisher)
             reduceAction(action)
             action
         } else {
@@ -39,7 +39,7 @@ class ActionDispatcher(
 
     private fun reduceAction(action: ActionFlow) {
         Timber.v("$tag - action: $action")
-        val currentState: ViewState = dataStore.currentState
+        val currentState: ViewState = getCurrentState()
         coroutineScope.launch(dispatcherProvider.io()) {
             try {
                 action.onAction(action, currentState)
