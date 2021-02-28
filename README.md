@@ -3,6 +3,4 @@ Using Kotlin to rewrite mosby sample mvi react app without mosby. More detail at
 
 Using Coroutines and ViewModel and LiveData to rewrite mvi react app
 
-TODO not reload for rotation change
-
 Home https://github.com/tlnacl/ReactShopKotlin/blob/master/app/src/main/java/com/tlnacl/reactiveapp/ui/home/HomeViewModel.kt
