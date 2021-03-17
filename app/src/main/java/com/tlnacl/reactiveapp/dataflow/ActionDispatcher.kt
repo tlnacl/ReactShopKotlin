@@ -1,8 +1,8 @@
-package com.tlnacl.reactiveapp.uniflow
+package com.tlnacl.reactiveapp.dataflow
 
 import com.tlnacl.reactiveapp.DispatcherProvider
-import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.data.ViewEvent
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

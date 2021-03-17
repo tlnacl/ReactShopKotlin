@@ -1,10 +1,10 @@
-package com.tlnacl.reactiveapp.uniflow
+package com.tlnacl.reactiveapp.dataflow
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tlnacl.reactiveapp.AppCoroutineDispatcher
 import com.tlnacl.reactiveapp.DispatcherProvider
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import kotlin.reflect.KClass
 
 abstract class DataFlowBaseViewModel(

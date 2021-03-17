@@ -1,7 +1,7 @@
-package com.tlnacl.reactiveapp.uniflow
+package com.tlnacl.reactiveapp.dataflow
 
 import com.tlnacl.reactiveapp.BuildConfig
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import timber.log.Timber
 import kotlin.reflect.KClass
 

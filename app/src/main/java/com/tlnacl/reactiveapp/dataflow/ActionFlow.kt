@@ -1,7 +1,7 @@
-package com.tlnacl.reactiveapp.uniflow
+package com.tlnacl.reactiveapp.dataflow
 
-import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.data.ViewEvent
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 
 typealias ActionFunction<T> = suspend ActionFlow.(T) -> (Unit)
 typealias ActionErrorFunction = suspend ActionFlow.(Exception, ViewState) -> (Unit)

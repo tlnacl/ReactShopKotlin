@@ -5,9 +5,9 @@ import com.tlnacl.reactiveapp.businesslogic.feed.HomeFeedLoader
 import com.tlnacl.reactiveapp.businesslogic.model.AdditionalItemsLoadable
 import com.tlnacl.reactiveapp.businesslogic.model.FeedItem
 import com.tlnacl.reactiveapp.businesslogic.model.SectionHeader
-import com.tlnacl.reactiveapp.uniflow.DataFlowBaseViewModel
-import com.tlnacl.reactiveapp.uniflow.actionOn
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.DataFlowBaseViewModel
+import com.tlnacl.reactiveapp.dataflow.actionOn
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import javax.inject.Inject
 
 class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) : DataFlowBaseViewModel(defaultState = ViewState.Loading) {

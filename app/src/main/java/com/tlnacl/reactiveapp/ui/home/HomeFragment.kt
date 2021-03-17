@@ -18,9 +18,9 @@ import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
 import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
 import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
-import com.tlnacl.reactiveapp.uniflow.onEvents
-import com.tlnacl.reactiveapp.uniflow.onStates
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.onEvents
+import com.tlnacl.reactiveapp.dataflow.onStates
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
@@ -50,6 +50,7 @@ class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreI
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("onViewCreated")
         viewModel = provideViewModel(viewModelFactory)
         spanCount = resources.getInteger(R.integer.grid_span_size)
         var layoutManager = GridLayoutManager(activity, spanCount)

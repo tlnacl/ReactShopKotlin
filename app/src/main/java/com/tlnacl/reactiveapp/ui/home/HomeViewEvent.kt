@@ -1,6 +1,6 @@
 package com.tlnacl.reactiveapp.ui.home
 
-import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
+import com.tlnacl.reactiveapp.dataflow.data.ViewEvent
 
 sealed class HomeViewEvent : ViewEvent() {
     object PullToRefreshSuccess : HomeViewEvent()

@@ -13,8 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 import javax.inject.Singleton
 
-
-
 @Module
 class AndroidModule(private val context: Context) {
 

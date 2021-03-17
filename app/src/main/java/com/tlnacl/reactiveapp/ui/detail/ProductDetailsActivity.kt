@@ -10,8 +10,8 @@ import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
-import com.tlnacl.reactiveapp.uniflow.onStates
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.onStates
 import kotlinx.android.synthetic.main.activity_product_detail.*
 import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber

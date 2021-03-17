@@ -1,4 +1,4 @@
-package com.tlnacl.reactiveapp.uniflow.data
+package com.tlnacl.reactiveapp.dataflow.data
 
 /**
  * Data Flow Event wrapper

@@ -2,8 +2,8 @@ package com.tlnacl.reactiveapp.ui.detail
 
 import com.tlnacl.reactiveapp.businesslogic.http.ProductBackendApiDecorator
 import com.tlnacl.reactiveapp.businesslogic.model.ProductDetail
-import com.tlnacl.reactiveapp.uniflow.DataFlowBaseViewModel
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.DataFlowBaseViewModel
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import javax.inject.Inject
 
 class ProductDetailsViewModel @Inject constructor(private val api: ProductBackendApiDecorator)

@@ -1,11 +1,11 @@
-package com.tlnacl.reactiveapp.uniflow
+package com.tlnacl.reactiveapp.dataflow
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.tlnacl.reactiveapp.DispatcherProvider
-import com.tlnacl.reactiveapp.uniflow.data.Event
-import com.tlnacl.reactiveapp.uniflow.data.ViewEvent
-import com.tlnacl.reactiveapp.uniflow.data.ViewState
+import com.tlnacl.reactiveapp.dataflow.data.Event
+import com.tlnacl.reactiveapp.dataflow.data.ViewEvent
+import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import kotlinx.coroutines.withContext
 
 class LiveDataPublisher(defaultState: ViewState, val dispatcherProvider: DispatcherProvider) {
