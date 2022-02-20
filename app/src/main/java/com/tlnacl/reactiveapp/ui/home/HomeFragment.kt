@@ -10,29 +10,25 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.tlnacl.reactiveapp.AndroidApplication
-import com.tlnacl.reactiveapp.R
+import com.tlnacl.reactiveapp.*
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import com.tlnacl.reactiveapp.provideViewModel
+import com.tlnacl.reactiveapp.databinding.FragmentHomeBinding
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
-import com.tlnacl.reactiveapp.ui.shop.MoreItemsViewHolder
-import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
 import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import com.tlnacl.reactiveapp.dataflow.onEvents
 import com.tlnacl.reactiveapp.dataflow.onStates
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.include_errorview.*
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Created by tomt on 27/06/17.
  */
-class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreItemsViewHolder.LoadItemsClickListener {
+class HomeFragment : Fragment() {
+    private val binding by viewBinding(FragmentHomeBinding::bind)
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    lateinit var viewModel:HomeViewModel
+    lateinit var viewModel: HomeViewModel
 
     var spanCount: Int = 2
     private lateinit var adapter: HomeAdapter
@@ -41,10 +37,14 @@ class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("HomeFragment OnCreate")
-        (activity!!.application as AndroidApplication).appComponent.inject(this)
+        (requireActivity().application as AndroidApplication).appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -63,22 +63,31 @@ class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreI
                 return 1
             }
         }
-        adapter = HomeAdapter(activity!!, this, this)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
-                resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
+        adapter = HomeAdapter({ onProductClicked(it) }, { loadItemsForCategory(it) })
+        binding.apply {
+            recyclerView.addItemDecoration(
+                GridSpacingItemDecoration(
+                    spanCount,
+                    resources.getDimensionPixelSize(R.dimen.grid_spacing), true
+                )
+            )
 
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = layoutManager
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = layoutManager
 
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (!adapter.isLoadingNextPage() && newState == RecyclerView.SCROLL_STATE_IDLE && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.getItems().size - 1)
-                    viewModel.loadNextPage()
-            }
-        })
-        swipeRefreshLayout.setOnRefreshListener { viewModel.pullToRefresh() }
-        onStates(viewModel) {viewState ->
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!adapter.isLoadingNextPage() && newState == RecyclerView.SCROLL_STATE_IDLE
+                        && layoutManager.findLastCompletelyVisibleItemPosition() == adapter.itemCount - 1
+                    ) {
+                        viewModel.loadNextPage()
+                    }
+                }
+            })
+            swipeRefreshLayout.setOnRefreshListener { viewModel.pullToRefresh() }
+        }
+        onStates(viewModel) { viewState ->
             when (viewState) {
                 is ViewState.Loading -> renderFirstPageLoading()
                 is ViewState.Failed -> renderFirstPageError()
@@ -87,49 +96,54 @@ class HomeFragment : Fragment(), ProductViewHolder.ProductClickedListener, MoreI
         }
         onEvents(viewModel) { event ->
             when (event) {
-                is HomeViewEvent.PullToRefreshSuccess -> recyclerView.smoothScrollToPosition(0)
-                is HomeViewEvent.Error -> Snackbar.make(view, R.string.error_unknown, Snackbar.LENGTH_LONG).show()
+                is HomeViewEvent.PullToRefreshSuccess -> binding.recyclerView.smoothScrollToPosition(
+                    0
+                )
+                is HomeViewEvent.Error -> Snackbar.make(
+                    view,
+                    R.string.error_unknown,
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
         viewModel.loadFirstPage()
     }
 
-    override fun onProductClicked(product: Product) {
+    private fun onProductClicked(product: Product) {
         val i = Intent(activity, ProductDetailsActivity::class.java)
         i.putExtra("productId", product.id)
-        activity!!.startActivity(i)
+        requireActivity().startActivity(i)
     }
 
-    override fun loadItemsForCategory(category: String) {
+    private fun loadItemsForCategory(category: String) {
         viewModel.loadAllProductsFromCategory(category)
     }
 
     private fun renderShowData(state: HomeViewState) {
-//        TransitionManager.beginDelayedTransition(view as ViewGroup)
-        loadingView.visibility = View.GONE
-        errorView.visibility = View.GONE
-        swipeRefreshLayout.visibility = View.VISIBLE
-        val changed = adapter.setLoadingNextPage(state.loadingNextPage)
-        if (changed && state.loadingNextPage) {
-            // scroll to the end of the list so that the user sees the load more progress bar
-            recyclerView.smoothScrollToPosition(adapter.itemCount)
+        binding.apply {
+            loadingView.visibility = View.GONE
+            errorView.root.visibility = View.GONE
+            swipeRefreshLayout.visibility = View.VISIBLE
+            val changed = adapter.setLoadingNextPage(state.loadingNextPage)
+            if (changed && state.loadingNextPage) {
+                // scroll to the end of the list so that the user sees the load more progress bar
+                recyclerView.smoothScrollToPosition(adapter.itemCount)
+            }
+            adapter.submitList(state.data)
+
+            swipeRefreshLayout.isRefreshing = state.loadingPullToRefresh
         }
-        adapter.setItems(state.data)
-
-        swipeRefreshLayout.isRefreshing = state.loadingPullToRefresh
     }
 
-    private fun renderFirstPageLoading() {
-//        TransitionManager.beginDelayedTransition(view as ViewGroup)
+    private fun renderFirstPageLoading() = binding.apply {
         loadingView.visibility = View.VISIBLE
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
     }
 
-    private fun renderFirstPageError() {
-//        TransitionManager.beginDelayedTransition(view as ViewGroup)
+    private fun renderFirstPageError() = binding.apply {
         loadingView.visibility = View.GONE
         swipeRefreshLayout.visibility = View.GONE
-        errorView.visibility = View.VISIBLE
+        errorView.root.visibility = View.VISIBLE
     }
 }

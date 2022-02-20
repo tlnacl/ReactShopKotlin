@@ -1,70 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="@color/scrim">
+    android:background="@color/scrim"
+    android:orientation="vertical">
 
-  <SearchView
-      android:id="@+id/searchView"
-      android:layout_width="match_parent"
-      android:layout_height="?attr/actionBarSize"
-      android:background="@color/search_toolbar_background"
-      android:iconifiedByDefault="false"
-      android:queryHint="@string/search_query_hint"
-      android:elevation="4dp"
-      />
-
-  <FrameLayout
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      >
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/search_toolbar_background"
+        android:elevation="4dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="@string/search_query_hint" />
 
     <FrameLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/window_background"
-        >
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-      <ProgressBar
-          android:id="@+id/loadingView"
-          android:layout_width="54dp"
-          android:layout_height="54dp"
-          android:layout_gravity="top|center_horizontal"
-          android:layout_margin="@dimen/search_progress_margin"
-          android:indeterminate="true"
-          android:visibility="gone"
-          tools:visibility="visible"
-          style="@style/Widget.AppCompat.ProgressBar"
-          />
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/window_background">
 
-      <include layout="@layout/include_errorview"/>
+            <ProgressBar
+                android:id="@+id/loadingView"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_margin="@dimen/search_progress_margin"
+                android:indeterminate="true"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-      <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/recyclerView"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:visibility="gone"
-          />
+            <include
+                android:id="@+id/errorView"
+                layout="@layout/include_errorview" />
 
-      <TextView
-          android:id="@+id/emptyView"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="top|center_horizontal"
-          android:layout_margin="@dimen/search_progress_margin"
-          android:drawableTop="@drawable/search_big"
-          android:gravity="center"
-          android:padding="16dp"
-          android:visibility="gone"
-          tools:visibility="visible"
-          android:text="@string/search_no_results"
-          android:textSize="18sp"
-          />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/emptyView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_margin="@dimen/search_progress_margin"
+                android:drawableTop="@drawable/search_big"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@string/search_no_results"
+                android:textSize="18sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </FrameLayout>
     </FrameLayout>
-  </FrameLayout>
 </LinearLayout>

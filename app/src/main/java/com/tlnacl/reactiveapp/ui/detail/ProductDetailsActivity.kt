@@ -10,10 +10,10 @@ import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.Constants
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.databinding.ActivityProductDetailBinding
 import com.tlnacl.reactiveapp.dataflow.data.ViewState
 import com.tlnacl.reactiveapp.dataflow.onStates
-import kotlinx.android.synthetic.main.activity_product_detail.*
-import kotlinx.android.synthetic.main.include_errorview.*
+import com.tlnacl.reactiveapp.viewBinding
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -23,6 +23,7 @@ import javax.inject.Inject
  */
 class ProductDetailsActivity : AppCompatActivity() {
     val KEY_PRODUCT_ID = "productId"
+    private val binding by viewBinding(ActivityProductDetailBinding::inflate)
     private var product: Product? = null
     private var isProductInshoppingCart = false
 
@@ -33,12 +34,13 @@ class ProductDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_product_detail)
         (application as AndroidApplication).appComponent.inject(this)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         Timber.d("onCreate")
-        val viewModel = ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
+        val viewModel =
+            ViewModelProvider(this, viewModelFactory).get(ProductDetailsViewModel::class.java)
 
-        onStates(viewModel) {state ->
+        onStates(viewModel) { state ->
 
             when (state) {
                 is ViewState.Loading -> renderLoading()
@@ -50,16 +52,16 @@ class ProductDetailsActivity : AppCompatActivity() {
         viewModel.getDetail(intent.getIntExtra(KEY_PRODUCT_ID, 0))
     }
 
-    private fun renderError() {
+    private fun renderError() = binding.apply {
         TransitionManager.beginDelayedTransition(rootView)
-        errorView.visibility = View.VISIBLE
+        errorView.root.visibility = View.VISIBLE
         loadingView.visibility = View.GONE
         detailsView.visibility = View.GONE
     }
 
-    private fun renderData(state: ProductDetailsViewState) {
+    private fun renderData(state: ProductDetailsViewState) = binding.apply {
         TransitionManager.beginDelayedTransition(rootView)
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         loadingView.visibility = View.GONE
         detailsView.visibility = View.VISIBLE
 
@@ -80,9 +82,9 @@ class ProductDetailsActivity : AppCompatActivity() {
 
     }
 
-    private fun renderLoading() {
+    private fun renderLoading() = binding.apply {
         TransitionManager.beginDelayedTransition(rootView)
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         loadingView.visibility = View.VISIBLE
         detailsView.visibility = View.GONE
     }

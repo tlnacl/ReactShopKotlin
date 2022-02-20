@@ -11,36 +11,36 @@ import androidx.transition.TransitionManager
 import com.tlnacl.reactiveapp.AndroidApplication
 import com.tlnacl.reactiveapp.R
 import com.tlnacl.reactiveapp.businesslogic.model.Product
+import com.tlnacl.reactiveapp.databinding.FragmentSearchBinding
 import com.tlnacl.reactiveapp.ui.detail.ProductDetailsActivity
-import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
 import com.tlnacl.reactiveapp.ui.widgets.GridSpacingItemDecoration
-import kotlinx.android.synthetic.main.fragment_search.*
-import kotlinx.android.synthetic.main.include_errorview.*
+import com.tlnacl.reactiveapp.viewBinding
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Created by tomt on 21/06/17.
  */
-class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedListener {
-    override fun onProductClicked(product: Product) {
-        val i = Intent(activity, ProductDetailsActivity::class.java)
-        i.putExtra("productId", product.id)
-        activity!!.startActivity(i)
-    }
-
+class SearchFragment : Fragment(), SearchView {
     private var spanCount: Int = 2
 
     private lateinit var adapter: SearchAdapter
 
-    @Inject lateinit var presenter: SearchPresenter
+    @Inject
+    lateinit var presenter: SearchPresenter
+
+    private val binding by viewBinding(FragmentSearchBinding::bind)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity!!.application as AndroidApplication).appComponent.inject(this)
+        (requireActivity().application as AndroidApplication).appComponent.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         //? how about init state at attachview ??
         presenter.attachView(this)
@@ -51,13 +51,18 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         spanCount = resources.getInteger(R.integer.grid_span_size)
-        adapter = SearchAdapter(activity!!, this)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
-        recyclerView.addItemDecoration(GridSpacingItemDecoration(spanCount,
-                resources.getDimensionPixelSize(R.dimen.grid_spacing), true))
+        adapter = SearchAdapter { onProductClicked(it) }
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = GridLayoutManager(activity, spanCount)
+        binding.recyclerView.addItemDecoration(
+            GridSpacingItemDecoration(
+                spanCount,
+                resources.getDimensionPixelSize(R.dimen.grid_spacing), true
+            )
+        )
 
-        searchView.setOnQueryTextListener(object : android.widget.SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object :
+            android.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextChange(queryString: String?): Boolean {
                 presenter.onUiEvent(queryString)
                 return true
@@ -71,8 +76,14 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
         presenter.onUiEvent("")
     }
 
+    private fun onProductClicked(product: Product) {
+        val i = Intent(activity, ProductDetailsActivity::class.java)
+        i.putExtra("productId", product.id)
+        requireActivity().startActivity(i)
+    }
+
     override fun render(searchViewState: SearchViewState) {
-        Timber.d("render:" + searchViewState)
+        Timber.d("render:$searchViewState")
         when (searchViewState) {
             is SearchViewState.SearchNotStartedYet -> renderSearchNotStarted()
             is SearchViewState.EmptyResult -> renderEmptyResult()
@@ -82,46 +93,44 @@ class SearchFragment : Fragment(), SearchView, ProductViewHolder.ProductClickedL
         }
     }
 
-    private fun renderResult(result: List<Product>) {
+    private fun renderResult(result: List<Product>) = binding.apply {
         TransitionManager.beginDelayedTransition(container)
         recyclerView.visibility = View.VISIBLE
         loadingView.visibility = View.GONE
         emptyView.visibility = View.GONE
-        errorView.visibility = View.GONE
-        adapter.setProducts(result)
-        adapter.notifyDataSetChanged()
+        errorView.root.visibility = View.GONE
+        adapter.submitList(result)
     }
 
-    private fun renderSearchNotStarted() {
+    private fun renderSearchNotStarted() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
         recyclerView.visibility = View.GONE
         loadingView.visibility = View.GONE
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         emptyView.visibility = View.GONE
     }
 
-    private fun renderLoading() {
+    private fun renderLoading() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
         recyclerView.visibility = View.GONE
         loadingView.visibility = View.VISIBLE
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         emptyView.visibility = View.GONE
     }
 
-    private fun renderError() {
+    private fun renderError() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
         recyclerView.visibility = View.GONE
         loadingView.visibility = View.GONE
-        errorView.visibility = View.VISIBLE
+        errorView.root.visibility = View.VISIBLE
         emptyView.visibility = View.GONE
     }
 
-    private fun renderEmptyResult() {
+    private fun renderEmptyResult() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
         recyclerView.visibility = View.GONE
         loadingView.visibility = View.GONE
-        errorView.visibility = View.GONE
+        errorView.root.visibility = View.GONE
         emptyView.visibility = View.VISIBLE
     }
-
 }

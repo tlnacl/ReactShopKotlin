@@ -1,27 +1,38 @@
 package com.tlnacl.reactiveapp.ui.search
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.tlnacl.reactiveapp.businesslogic.model.Product
-import com.tlnacl.reactiveapp.ui.shop.ProductViewHolder
+import com.tlnacl.reactiveapp.databinding.ItemProductBinding
+import com.tlnacl.reactiveapp.ui.home.ProductViewHolder
 
 /**
  * Created by tomt on 21/06/17.
  */
-class SearchAdapter(private val context: Context, private val callback: ProductViewHolder.ProductClickedListener) : RecyclerView.Adapter<ProductViewHolder>() {
-    private var products: List<Product> = emptyList()
+class SearchAdapter(private val onProductClick: (Product) -> Unit) :
+    ListAdapter<Product, ProductViewHolder>(SearchDiffCallback()) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProductViewHolder(
+        ItemProductBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+        onProductClick
+    )
 
-    fun setProducts(products: List<Product>) {
-        this.products = products
-        notifyDataSetChanged()
+    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+}
+
+class SearchDiffCallback : DiffUtil.ItemCallback<Product>() {
+    override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
+        return oldItem == newItem
     }
 
-    override fun getItemCount() = products.size
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ProductViewHolder(context, parent, callback)
-
-    override fun onBindViewHolder(holder: ProductViewHolder, position: Int) = holder.bind(products[position])
+    override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
+        return oldItem == newItem
+    }
 
 }
 
