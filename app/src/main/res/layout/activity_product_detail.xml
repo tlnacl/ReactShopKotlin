@@ -22,8 +22,7 @@
         android:id="@+id/detailsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        tools:context="com.hannesdorfmann.mosby3.sample.mvi.view.detail.ProductDetailsActivity">
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
@@ -65,13 +64,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingLeft="72dp"
-            android:paddingTop="16dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="16dp"
+            android:paddingHorizontal="72dp"
+            android:paddingVertical="16dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">

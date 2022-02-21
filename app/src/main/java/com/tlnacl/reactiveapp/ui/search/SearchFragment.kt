@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionManager
@@ -95,42 +96,42 @@ class SearchFragment : Fragment(), SearchView {
 
     private fun renderResult(result: List<Product>) = binding.apply {
         TransitionManager.beginDelayedTransition(container)
-        recyclerView.visibility = View.VISIBLE
-        loadingView.visibility = View.GONE
-        emptyView.visibility = View.GONE
-        errorView.root.visibility = View.GONE
+        recyclerView.isVisible = true
+        loadingView.isVisible = false
+        emptyView.isVisible = false
+        errorView.root.isVisible = false
         adapter.submitList(result)
     }
 
     private fun renderSearchNotStarted() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
-        recyclerView.visibility = View.GONE
-        loadingView.visibility = View.GONE
-        errorView.root.visibility = View.GONE
-        emptyView.visibility = View.GONE
+        recyclerView.isVisible = false
+        loadingView.isVisible = false
+        errorView.root.isVisible = false
+        emptyView.isVisible = false
     }
 
     private fun renderLoading() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
-        recyclerView.visibility = View.GONE
-        loadingView.visibility = View.VISIBLE
-        errorView.root.visibility = View.GONE
-        emptyView.visibility = View.GONE
+        recyclerView.isVisible = false
+        loadingView.isVisible = true
+        errorView.root.isVisible = false
+        emptyView.isVisible = false
     }
 
     private fun renderError() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
-        recyclerView.visibility = View.GONE
-        loadingView.visibility = View.GONE
-        errorView.root.visibility = View.VISIBLE
-        emptyView.visibility = View.GONE
+        recyclerView.isVisible = false
+        loadingView.isVisible = false
+        errorView.root.isVisible = true
+        emptyView.isVisible = false
     }
 
     private fun renderEmptyResult() = binding.apply {
         TransitionManager.beginDelayedTransition(container)
-        recyclerView.visibility = View.GONE
-        loadingView.visibility = View.GONE
-        errorView.root.visibility = View.GONE
-        emptyView.visibility = View.VISIBLE
+        recyclerView.isVisible = false
+        loadingView.isVisible = false
+        errorView.root.isVisible = false
+        emptyView.isVisible = true
     }
 }

@@ -14,6 +14,6 @@ class ProductDetailsViewModel @Inject constructor(private val api: ProductBacken
                 val product = api.getProduct(productId)
                 setState(ProductDetailsViewState(ProductDetail(product, false)))
             },
-            onError = { error, _ -> setState { ViewState.Failed } }
+            onError = { _, _ -> setState { ViewState.Failed } }
     )
 }

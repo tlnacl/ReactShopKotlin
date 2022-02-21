@@ -3,6 +3,7 @@ package com.tlnacl.reactiveapp.ui.detail
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionManager
 import coil.load
@@ -22,7 +23,7 @@ import javax.inject.Inject
  * Created by tlnacl on 11/07/17.
  */
 class ProductDetailsActivity : AppCompatActivity() {
-    val KEY_PRODUCT_ID = "productId"
+    private val KEY_PRODUCT_ID = "productId"
     private val binding by viewBinding(ActivityProductDetailBinding::inflate)
     private var product: Product? = null
     private var isProductInshoppingCart = false
@@ -32,7 +33,7 @@ class ProductDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product_detail)
+        setContentView(binding.root)
         (application as AndroidApplication).appComponent.inject(this)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -53,17 +54,15 @@ class ProductDetailsActivity : AppCompatActivity() {
     }
 
     private fun renderError() = binding.apply {
-        TransitionManager.beginDelayedTransition(rootView)
-        errorView.root.visibility = View.VISIBLE
-        loadingView.visibility = View.GONE
-        detailsView.visibility = View.GONE
+        errorView.root.isVisible = true
+        loadingView.isVisible = false
+        detailsView.isVisible = false
     }
 
     private fun renderData(state: ProductDetailsViewState) = binding.apply {
-        TransitionManager.beginDelayedTransition(rootView)
-        errorView.root.visibility = View.GONE
-        loadingView.visibility = View.GONE
-        detailsView.visibility = View.VISIBLE
+        errorView.root.isVisible = false
+        loadingView.isVisible = false
+        detailsView.isVisible = true
 
         isProductInshoppingCart = state.data.isInShoppingCart
         product = state.data.product
@@ -79,14 +78,12 @@ class ProductDetailsActivity : AppCompatActivity() {
         }
 
         backdrop.load(Constants.BASE_IMAGE_URL + product?.image)
-
     }
 
     private fun renderLoading() = binding.apply {
-        TransitionManager.beginDelayedTransition(rootView)
-        errorView.root.visibility = View.GONE
-        loadingView.visibility = View.VISIBLE
-        detailsView.visibility = View.GONE
+        errorView.root.isVisible = false
+        loadingView.isVisible = true
+        detailsView.isVisible = false
     }
 
 }

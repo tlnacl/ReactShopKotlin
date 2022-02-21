@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -121,9 +122,9 @@ class HomeFragment : Fragment() {
 
     private fun renderShowData(state: HomeViewState) {
         binding.apply {
-            loadingView.visibility = View.GONE
-            errorView.root.visibility = View.GONE
-            swipeRefreshLayout.visibility = View.VISIBLE
+            loadingView.isVisible = false
+            errorView.root.isVisible = false
+            swipeRefreshLayout.isVisible = true
             val changed = adapter.setLoadingNextPage(state.loadingNextPage)
             if (changed && state.loadingNextPage) {
                 // scroll to the end of the list so that the user sees the load more progress bar
@@ -136,14 +137,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun renderFirstPageLoading() = binding.apply {
-        loadingView.visibility = View.VISIBLE
-        errorView.root.visibility = View.GONE
-        swipeRefreshLayout.visibility = View.GONE
+        loadingView.isVisible = true
+        errorView.root.isVisible = false
+        swipeRefreshLayout.isVisible = false
     }
 
     private fun renderFirstPageError() = binding.apply {
-        loadingView.visibility = View.GONE
-        swipeRefreshLayout.visibility = View.GONE
-        errorView.root.visibility = View.VISIBLE
+        loadingView.isVisible = false
+        swipeRefreshLayout.isVisible = false
+        errorView.root.isVisible = true
     }
 }

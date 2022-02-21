@@ -9,7 +9,8 @@
         <entry key="app/src/main/res/layout/fragment_search.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_shopping_cart.xml" value="0.2703125" />
         <entry key="app/src/main/res/layout/include_errorview.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/item_more_available.xml" value="0.4036458333333333" />
+        <entry key="app/src/main/res/layout/item_more_available.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/item_product.xml" value="0.1" />
       </map>
     </option>
   </component>
