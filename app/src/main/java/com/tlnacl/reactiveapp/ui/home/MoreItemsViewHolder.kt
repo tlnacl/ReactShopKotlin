@@ -12,11 +12,11 @@ class MoreItemsViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: AdditionalItemsLoadable) = binding.apply {
-        itemView.setOnClickListener { onMoreClick(item.categoryName) }
-        binding.errorRetryButton.setOnClickListener { onMoreClick(item.categoryName) }
-        binding.loadMoreButton.setOnClickListener { onMoreClick(item.categoryName) }
+        itemView.setOnClickListener { onMoreClick(item.groupName) }
+        binding.errorRetryButton.setOnClickListener { onMoreClick(item.groupName) }
+        binding.loadMoreButton.setOnClickListener { onMoreClick(item.groupName) }
         when {
-            item.isLoading -> {
+            item.loading -> {
                 moreItemsCount.isVisible = false
                 loadMoreButton.isVisible = false
                 loadingView.isVisible = true
@@ -31,7 +31,7 @@ class MoreItemsViewHolder(
                 itemView.isClickable = true
             }
             else -> {
-                moreItemsCount.text = "+ ${item.moreItemsCount}"
+                moreItemsCount.text = "+ ${item.moreItemsAvailableCount}"
                 moreItemsCount.isVisible = true
                 loadMoreButton.isVisible = true
                 loadingView.isVisible = false

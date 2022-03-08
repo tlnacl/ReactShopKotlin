@@ -141,7 +141,7 @@ class HomeDiffCallback : DiffUtil.ItemCallback<FeedItem>() {
             return true
         }
 
-        if (oldItem is AdditionalItemsLoadable && newItem is AdditionalItemsLoadable && oldItem.categoryName == newItem.categoryName) {
+        if (oldItem is AdditionalItemsLoadable && newItem is AdditionalItemsLoadable && oldItem.groupName == newItem.groupName) {
             return true
         }
         return false

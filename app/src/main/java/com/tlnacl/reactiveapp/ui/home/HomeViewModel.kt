@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) 
                     is HomeViewState -> {
                         val found = findAdditionalItems(categoryName, currentState.data)
                         val foundItem = found.second
-                        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount, foundItem.categoryName, false, error)
+                        val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount, foundItem.groupName, false, error)
 
                         val data = ArrayList<FeedItem>(currentState.data.size)
                         data.addAll(currentState.data)
@@ -102,7 +102,7 @@ class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) 
         val found = findAdditionalItems(categoryName, homeViewState.data)
         val foundItem = found.second
         val toInsert = AdditionalItemsLoadable(foundItem!!.moreItemsAvailableCount,
-                foundItem.categoryName, true, null)
+                foundItem.groupName, true, null)
 
         val data = ArrayList<FeedItem>(homeViewState.data.size)
         data.addAll(homeViewState.data)
@@ -122,7 +122,7 @@ class HomeViewModel @Inject constructor(private val feedLoader: HomeFeedLoader) 
         val size = items.size
         for (i in 0 until size) {
             val item = items[i]
-            if (item is AdditionalItemsLoadable && item.categoryName.equals(categoryName)) {
+            if (item is AdditionalItemsLoadable && item.groupName == categoryName) {
                 return Pair.create(i, item)
             }
         }

@@ -12,7 +12,7 @@ class ProductDetailsViewModel @Inject constructor(private val api: ProductBacken
     fun getDetail(productId: Int) = action(
             onAction = {
                 val product = api.getProduct(productId)
-                setState(ProductDetailsViewState(ProductDetail(product, false)))
+                setState(ProductDetailsViewState(ProductDetail(product!!, false)))
             },
             onError = { _, _ -> setState { ViewState.Failed } }
     )
